@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rosa's Ventrue Feeding Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const useState = React.useState;
+
+        function VentrueFeedingGenerator() {
+            const [city, setCity] = useState('');
+            const [currentTarget, setCurrentTarget] = useState(null);
+            const [isGenerating, setIsGenerating] = useState(false);
+            const [selectedCategories, setSelectedCategories] = useState({
+                Music: true,
+                'Film and TV': true,
+                Comedy: true,
+                Politics: true,
+                'Business and Tech': true,
+                Sports: true,
+                'Culture and Academia': true,
+                Royalty: true,
+                Crime: true,
+                'Social Media': true,
+                Associates: true
+            });
+
+            const targetTypes = [
+                {
+                    category: 'Music',
+                    roles: ['Pop Star', 'Rock Musician', 'Hip-Hop Artist', 'Classical Conductor', 'Opera Singer', 'Jazz Performer', 'DJ/Producer', 'Music Executive'],
+                    locations: ['Recording Studio', 'Concert Venue Backstage', 'Music Label Office', 'Exclusive Nightclub VIP Area', 'Private Rehearsal Space', 'Luxury Hotel Suite', 'Award Show After-Party', 'Radio Station']
+                },
+                {
+                    category: 'Film and TV',
+                    roles: ['Hollywood Actor', 'TV Star', 'Director', 'Producer', 'Showrunner', 'Streaming Series Lead', 'Character Actor', 'Voice Actor'],
+                    locations: ['Film Studio Lot', 'TV Network Building', 'Premiere After-Party', 'Luxury Hotel Penthouse', 'Private Screening Room', 'Trailer on Set', 'Production Office', 'Casting Agency']
+                },
+                {
+                    category: 'Comedy',
+                    roles: ['Stand-up Comedian', 'Comedy Writer', 'Sketch Performer', 'Late Night Host', 'Comedy Podcast Host', 'Improv Actor', 'Satirist'],
+                    locations: ['Comedy Club Green Room', 'Late Night Studio', 'Podcast Recording Studio', 'Theater Backstage', 'Writers Room', 'Comedy Festival Venue', 'Exclusive Comedy Bar']
+                },
+                {
+                    category: 'Politics',
+                    roles: ['Senator', 'Mayor', 'Governor', 'Ambassador', 'City Council Member', 'Political Commentator', 'Campaign Manager', 'Lobbyist', 'Political Strategist'],
+                    locations: ['City Hall Private Office', 'Exclusive Political Club', 'Embassy Reception', 'Private Fundraiser Venue', 'Government Building', 'Elite Country Club', 'Five-Star Hotel Bar', 'Political Convention Suite']
+                },
+                {
+                    category: 'Business and Tech',
+                    roles: ['Tech CEO', 'Startup Founder', 'Venture Capitalist', 'Real Estate Mogul', 'Investment Banker', 'Media Executive', 'Fortune 500 CEO', 'Cryptocurrency Entrepreneur', 'E-commerce Magnate'],
+                    locations: ['Corporate Boardroom', 'Private Members Club', 'Tech Campus', 'Luxury Car Dealership', 'Executive Airport Lounge', 'High-rise Penthouse Office', 'Exclusive Golf Club', 'Premium Steakhouse', 'Yacht Club']
+                },
+                {
+                    category: 'Sports',
+                    roles: ['Professional Athlete', 'Team Owner', 'Sports Commentator', 'Olympic Medalist', 'Retired Champion', 'Sports Agent', 'Team Coach', 'Athletic Director'],
+                    locations: ['VIP Stadium Suite', 'Elite Fitness Center', 'Sports Bar (upscale)', 'Team Training Facility', 'Athletes-only Lounge', 'Luxury Sports Complex', 'Celebrity Golf Course', 'Private Boxing Gym']
+                },
+                {
+                    category: 'Culture and Academia',
+                    roles: ['Renowned Chef', 'Museum Director', 'Art Gallery Owner', 'Famous Author', 'Classical Musician', 'Opera Performer', 'Fashion Designer', 'Architect', 'University Professor', 'Research Scientist', 'Playwright', 'Contemporary Artist', 'Ballet Dancer'],
+                    locations: ['Michelin-starred Restaurant', 'Private Art Gallery', 'Opera House VIP Box', 'Literary Salon', 'Designer Boutique', 'Cultural Center VIP Area', 'Exclusive Book Launch', 'University Faculty Club', 'Museum Private Collection Room', 'Theater Opening Night Party']
+                },
+                {
+                    category: 'Royalty',
+                    roles: ['Prince', 'Princess', 'Duke', 'Duchess', 'Count', 'Countess', 'Baron', 'Baroness', 'Royal Advisor', 'Royal Family Member'],
+                    locations: ['Palace Private Wing', 'Royal Estate', 'Diplomatic Reception', 'Exclusive Royal Gala', 'Private Royal Box', 'Aristocratic Club', 'Historic Manor', 'Royal Charity Event']
+                },
+                {
+                    category: 'Crime',
+                    roles: ['Crime Boss', 'Underworld Financier', 'Black Market Dealer', 'Organized Crime Lieutenant', 'Money Launderer', 'Smuggling Kingpin', 'Casino Owner', 'Corrupt Official'],
+                    locations: ['Private Casino Backroom', 'Exclusive Underground Club', 'Waterfront Warehouse Office', 'Upscale Strip Club VIP', 'Money Laundering Front Business', 'High-end Restaurant Back Office', 'Luxury Penthouse', 'Private Poker Game']
+                },
+                {
+                    category: 'Social Media',
+                    roles: ['Mega Influencer', 'YouTube Star', 'TikTok Celebrity', 'Instagram Model', 'Twitch Streamer', 'Content Creator', 'Social Media Mogul', 'Online Personality'],
+                    locations: ['Content Creation Studio', 'Influencer Event', 'Brand Partnership Office', 'Trendy Restaurant (for content)', 'Social Media Company HQ', 'Creator House', 'Pop-up Store Launch', 'Exclusive Influencer Lounge']
+                }
+            ];
+
+            const securityLevels = [
+                { level: 'Minimal', icon: '🟢', description: 'Personal assistant only' },
+                { level: 'Light', icon: '🟡', description: 'Small security detail' },
+                { level: 'Moderate', icon: '🟠', description: 'Professional bodyguards' },
+                { level: 'Heavy', icon: '🔴', description: 'Multiple security layers' }
+            ];
+
+            const famelevels = [
+                { tier: 'A', level: 'A-List Celebrity', description: 'Internationally known, household name' },
+                { tier: 'B', level: 'B-List Celebrity', description: 'Movie stars, pop stars, nationally famous' },
+                { tier: 'C', level: 'C-List Celebrity', description: 'TV cast, nationally recognized in own country' },
+                { tier: 'D', level: 'D-List Celebrity', description: 'Reality TV stars, minor celebrities' },
+                { tier: 'Z', level: 'Z-List Celebrity', description: 'Influencers, niche channel personalities' }
+            ];
+
+            const generateName = (city) => {
+                const nameData = {
+                    english: {
+                        first: ['James', 'Mary', 'Robert', 'Patricia', 'John', 'Jennifer', 'Michael', 'Linda', 'David', 'Elizabeth', 'William', 'Barbara', 'Richard', 'Susan', 'Joseph', 'Jessica', 'Thomas', 'Sarah', 'Christopher', 'Karen'],
+                        last: ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore']
+                    },
+                    italian: {
+                        first: ['Giuseppe', 'Maria', 'Antonio', 'Anna', 'Francesco', 'Rosa', 'Angelo', 'Teresa', 'Vincenzo', 'Lucia'],
+                        last: ['Rossi', 'Russo', 'Ferrari', 'Esposito', 'Bianchi', 'Romano', 'Colombo', 'Ricci']
+                    },
+                    french: {
+                        first: ['Jean', 'Marie', 'Michel', 'Francoise', 'Pierre', 'Monique', 'Andre', 'Catherine'],
+                        last: ['Martin', 'Bernard', 'Thomas', 'Petit', 'Robert', 'Richard', 'Durand', 'Dubois']
+                    },
+                    german: {
+                        first: ['Hans', 'Anna', 'Klaus', 'Ursula', 'Jurgen', 'Ingrid', 'Wolfgang', 'Petra'],
+                        last: ['Muller', 'Schmidt', 'Schneider', 'Fischer', 'Weber', 'Meyer', 'Wagner', 'Becker']
+                    },
+                    spanish: {
+                        first: ['Antonio', 'Maria', 'Jose', 'Carmen', 'Francisco', 'Josefa', 'Juan', 'Isabel'],
+                        last: ['Garcia', 'Gonzalez', 'Rodriguez', 'Fernandez', 'Lopez', 'Martinez', 'Sanchez', 'Perez']
+                    },
+                    nordic: {
+                        first: ['Erik', 'Anna', 'Lars', 'Emma', 'Nils', 'Astrid', 'Magnus', 'Ingrid'],
+                        last: ['Andersson', 'Johansson', 'Karlsson', 'Nilsson', 'Eriksson', 'Larsson']
+                    },
+                    slavic: {
+                        first: ['Vladimir', 'Svetlana', 'Dmitri', 'Natasha', 'Alexei', 'Irina', 'Mikhail', 'Elena'],
+                        last: ['Ivanov', 'Petrov', 'Smirnov', 'Kuznetsov', 'Popov', 'Volkov']
+                    },
+                    eastasian: {
+                        first: ['Hiroshi', 'Yuki', 'Takeshi', 'Akiko', 'Wei', 'Li', 'Chen', 'Wang'],
+                        last: ['Tanaka', 'Suzuki', 'Takahashi', 'Watanabe', 'Wang', 'Li', 'Zhang', 'Liu']
+                    },
+                    middleeastern: {
+                        first: ['Ahmed', 'Fatima', 'Mohammad', 'Aisha', 'Ali', 'Zahra', 'Hassan', 'Maryam'],
+                        last: ['Al-Ahmad', 'Al-Mohammad', 'Al-Ali', 'Mahmoud', 'Ibrahim', 'Mansour']
+                    }
+                };
+
+                const cityRegions = {
+                    'london': 'english', 'new york': 'english', 'los angeles': 'english', 'chicago': 'english',
+                    'toronto': 'english', 'sydney': 'english', 'paris': 'french', 'berlin': 'german',
+                    'rome': 'italian', 'madrid': 'spanish', 'stockholm': 'nordic', 'moscow': 'slavic',
+                    'tokyo': 'eastasian', 'dubai': 'middleeastern'
+                };
+
+                const cityLower = city.toLowerCase().trim();
+                const region = cityRegions[cityLower] || 'english';
+                const namePool = nameData[region];
+                const firstName = namePool.first[Math.floor(Math.random() * namePool.first.length)];
+                const lastName = namePool.last[Math.floor(Math.random() * namePool.last.length)];
+                
+                return firstName + ' ' + lastName;
+            };
+
+            const getWeightedTier = () => {
+                const pool = [];
+                for(let i = 0; i < 1; i++) pool.push('A');
+                for(let i = 0; i < 2; i++) pool.push('B');
+                for(let i = 0; i < 5; i++) pool.push('C');
+                for(let i = 0; i < 6; i++) pool.push('D');
+                for(let i = 0; i < 6; i++) pool.push('Z');
+                const tier = pool[Math.floor(Math.random() * pool.length)];
+                return famelevels.find(t => t.tier === tier);
+            };
+
+            const getDifficultyForTier = (tier) => {
+                const ranges = {
+                    'A': [3, 4, 5],
+                    'B': [2, 3, 4, 5],
+                    'C': [1, 2, 3, 4],
+                    'D': [1, 2, 3],
+                    'Z': [0, 1, 2, 3]
+                };
+                const range = ranges[tier];
+                return range[Math.floor(Math.random() * range.length)];
+            };
+
+            const generateAssociate = (primaryCelebrity, primaryTier) => {
+                const relationships = [
+                    'Spouse of', 'Partner of', 'Ex-spouse of', 'Parent of', 'Child of', 
+                    'Sibling of', 'Business partner of', 'Manager of', 'Agent of', 'Best friend of'
+                ];
+                
+                const associateRoles = [
+                    'Socialite', 'Private Investor', 'Philanthropist', 'Art Collector',
+                    'Fashion Designer', 'Restaurant Owner', 'Boutique Owner', 'Lifestyle Brand Owner',
+                    'Former Model', 'Trust Fund Heir'
+                ];
+
+                const tierMap = { 'A': 'C', 'B': 'D', 'C': 'Z', 'D': 'Z', 'Z': 'Z' };
+                const associateTier = tierMap[primaryTier];
+                const associateFame = famelevels.find(f => f.tier === associateTier);
+                
+                const relationship = relationships[Math.floor(Math.random() * relationships.length)];
+                const role = associateRoles[Math.floor(Math.random() * associateRoles.length)];
+                
+                return { relationship, role, primaryCelebrity, fame: associateFame };
+            };
+
+            const handleCategoryChange = (category) => {
+                setSelectedCategories(prev => ({
+                    ...prev,
+                    [category]: !prev[category]
+                }));
+            };
+
+            const getAvailableCategories = () => {
+                return targetTypes.filter(category => selectedCategories[category.category]);
+            };
+
+            const handleKeyPress = (e) => {
+                if (e.key === 'Enter') {
+                    generateTarget();
+                }
+            };
+
+            const generateTarget = () => {
+                if (!city.trim()) return;
+                
+                const availableCategories = getAvailableCategories();
+                if (availableCategories.length === 0 && !selectedCategories['Associates']) {
+                    alert('Please select at least one target category.');
+                    return;
+                }
+                
+                setIsGenerating(true);
+                
+                try {
+                    let allCategories = [...availableCategories];
+                    if (selectedCategories['Associates']) {
+                        allCategories.push({ category: 'Associates' });
+                    }
+
+                    const category = allCategories[Math.floor(Math.random() * allCategories.length)];
+                    const isAssociate = category.category === 'Associates';
+                    
+                    let target;
+                    const fame = getWeightedTier();
+                    const difficulty = getDifficultyForTier(fame.tier);
+                    
+                    if (isAssociate) {
+                        const nonAssociateCategories = targetTypes.filter(t => t.category !== 'Associates');
+                        const primaryCategory = nonAssociateCategories[Math.floor(Math.random() * nonAssociateCategories.length)];
+                        const primaryRole = primaryCategory.roles[Math.floor(Math.random() * primaryCategory.roles.length)];
+                        const primaryName = generateName(city);
+                        const primaryTier = fame.tier;
+                        
+                        const associateInfo = generateAssociate(primaryName, primaryTier);
+                        const name = generateName(city);
+                        
+                        const associateLocations = [
+                            'Private Residence', 'Exclusive Spa', 'High-end Shopping District',
+                            'Luxury Hotel Lounge', 'Private Members Club', 'Gallery Opening',
+                            'Charity Luncheon', 'Country Club', 'Designer Boutique', 'Premium Restaurant'
+                        ];
+                        
+                        const location = associateLocations[Math.floor(Math.random() * associateLocations.length)];
+                        const security = securityLevels[Math.floor(Math.random() * securityLevels.length)];
+                        
+                        target = {
+                            name: name,
+                            role: associateInfo.role,
+                            category: 'Associates',
+                            location: location + ' - ' + city,
+                            security: security,
+                            fame: associateInfo.fame,
+                            isAssociate: true,
+                            relationship: associateInfo.relationship,
+                            primaryCelebrity: associateInfo.primaryCelebrity,
+                            primaryRole: primaryRole,
+                            difficulty: getDifficultyForTier(associateInfo.fame.tier)
+                        };
+                    } else {
+                        const role = category.roles[Math.floor(Math.random() * category.roles.length)];
+                        const location = category.locations[Math.floor(Math.random() * category.locations.length)];
+                        const security = securityLevels[Math.floor(Math.random() * securityLevels.length)];
+                        const name = generateName(city);
+                        
+                        target = {
+                            name: name,
+                            role: role,
+                            category: category.category,
+                            location: location + ' - ' + city,
+                            security: security,
+                            fame: fame,
+                            isAssociate: false,
+                            difficulty: difficulty
+                        };
+                    }
+                    
+                    const hooks = [
+                        'Recently involved in a scandal',
+                        'Celebrating a major achievement',
+                        'In town for a secret business deal',
+                        'Attending a private charity event',
+                        'Meeting with local power brokers',
+                        'Recovering from recent controversy',
+                        'Launching a new venture',
+                        'In the midst of a power struggle'
+                    ];
+                    
+                    const complications = [
+                        'Heavy media presence nearby',
+                        'Rival faction also interested',
+                        'Unexpected additional security',
+                        'Public event with many witnesses',
+                        'Personal bodyguard is a ghoul',
+                        'Location has mystical wards',
+                        'Target is suspicious of strangers',
+                        'Police investigation ongoing'
+                    ];
+
+                    target.hook = hooks[Math.floor(Math.random() * hooks.length)];
+                    target.complication = complications[Math.floor(Math.random() * complications.length)];
+
+                    setTimeout(() => {
+                        setCurrentTarget(target);
+                        setIsGenerating(false);
+                    }, 800);
+                    
+                } catch (error) {
+                    console.error('Error generating target:', error);
+                    setIsGenerating(false);
+                }
+            };
+
+            const allCategoriesUnchecked = Object.values(selectedCategories).every(val => !val);
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-red-950 via-black to-gray-900 text-red-100 p-6">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="text-center mb-8">
+                            <h1 className="text-4xl font-bold text-red-300 mb-2">
+                                Rosa's Ventrue Feeding Generator
+                            </h1>
+                            <p className="text-red-200 text-lg">Find worthy prey for your discriminating Ventrue</p>
+                        </div>
+
+                        <div className="bg-black/50 backdrop-blur rounded-lg border border-red-800/30 p-6 mb-6">
+                            <h3 className="text-xl font-bold text-red-300 mb-4">Target Categories</h3>
+                            <p className="text-red-200 mb-4 text-sm">Select which types of targets are appropriate for your current scene:</p>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {targetTypes.map((category) => (
+                                    <label key={category.category} className="flex items-center space-x-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedCategories[category.category]}
+                                            onChange={() => handleCategoryChange(category.category)}
+                                            className="w-4 h-4 text-red-600 bg-gray-900 border-red-700 rounded focus:ring-red-500 focus:ring-2"
+                                        />
+                                        <span className={selectedCategories[category.category] ? 'text-sm font-medium text-red-300' : 'text-sm font-medium text-gray-400'}>
+                                            {category.category}
+                                        </span>
+                                    </label>
+                                ))}
+                                <label className="flex items-center space-x-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedCategories['Associates']}
+                                        onChange={() => handleCategoryChange('Associates')}
+                                        className="w-4 h-4 text-red-600 bg-gray-900 border-red-700 rounded focus:ring-red-500 focus:ring-2"
+                                    />
+                                    <span className={selectedCategories['Associates'] ? 'text-sm font-medium text-red-300' : 'text-sm font-medium text-gray-400'}>
+                                        Associates
+                                    </span>
+                                </label>
+                            </div>
+                            
+                            {allCategoriesUnchecked && (
+                                <div className="mt-4 p-3 bg-yellow-900/30 border border-yellow-700/50 rounded-lg">
+                                    <p className="text-yellow-300 text-sm">Warning: No target categories selected. Please choose at least one.</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="bg-black/50 backdrop-blur rounded-lg border border-red-800/30 p-6 mb-6">
+                            <div className="flex gap-4 items-end flex-wrap">
+                                <div className="flex-1 min-w-[200px]">
+                                    <label className="block text-red-300 font-medium mb-2">Enter City Name</label>
+                                    <input
+                                        type="text"
+                                        value={city}
+                                        onChange={(e) => setCity(e.target.value)}
+                                        onKeyPress={handleKeyPress}
+                                        placeholder="e.g., New York, London, Tokyo..."
+                                        className="w-full px-4 py-3 bg-gray-900 border border-red-700 rounded-lg text-white placeholder-red-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                                    />
+                                </div>
+                                <button
+                                    onClick={generateTarget}
+                                    disabled={!city.trim() || isGenerating || allCategoriesUnchecked}
+                                    className="px-6 py-3 bg-red-800 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-lg font-medium transition-colors"
+                                >
+                                    {isGenerating ? 'Hunting...' : 'Find Target'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {currentTarget && (
+                            <div className="bg-black/50 backdrop-blur rounded-lg border border-red-800/30 p-6">
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-red-300 mb-4">{currentTarget.name}</h2>
+                                        
+                                        <div className="space-y-3">
+                                            {currentTarget.isAssociate && (
+                                                <div className="bg-purple-900/30 rounded-lg p-3 mb-3">
+                                                    <p className="text-purple-200 text-sm">
+                                                        <strong>{currentTarget.relationship}</strong> {currentTarget.primaryCelebrity}
+                                                    </p>
+                                                    <p className="text-purple-300 text-xs mt-1">({currentTarget.primaryRole})</p>
+                                                </div>
+                                            )}
+                                            
+                                            <div className="text-red-200">
+                                                <strong>Role:</strong> {currentTarget.role}
+                                            </div>
+                                            
+                                            <div className="text-red-200">
+                                                <strong>Location:</strong> {currentTarget.location}
+                                            </div>
+                                            
+                                            <div className="text-red-200">
+                                                <strong>Fame Tier:</strong> {currentTarget.fame.tier}-List
+                                            </div>
+                                            
+                                            <div className="bg-gray-800/50 rounded-lg p-2">
+                                                <span className="text-sm text-gray-300">{currentTarget.fame.description}</span>
+                                            </div>
+                                            
+                                            <div className="text-red-200">
+                                                <strong>Security:</strong> {currentTarget.security.icon} {currentTarget.security.level} ({currentTarget.security.description})
+                                            </div>
+                                            
+                                            <div className="text-red-200">
+                                                <strong>Difficulty:</strong> {(() => {
+                                                    let stars = '';
+                                                    for(let i = 0; i < currentTarget.difficulty; i++) stars += '★';
+                                                    for(let i = currentTarget.difficulty; i < 5; i++) stars += '☆';
+                                                    return stars;
+                                                })()}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h3 className="text-xl font-bold text-red-300 mb-4">Story Elements</h3>
+                                        
+                                        <div className="space-y-4">
+                                            <div className="bg-red-900/30 rounded-lg p-4">
+                                                <h4 className="font-semibold text-red-300 mb-2">Current Situation</h4>
+                                                <p className="text-red-200">{currentTarget.hook}</p>
+                                            </div>
+                                            
+                                            <div className="bg-yellow-900/30 rounded-lg p-4">
+                                                <h4 className="font-semibold text-yellow-300 mb-2">Potential Complication</h4>
+                                                <p className="text-yellow-200">{currentTarget.complication}</p>
+                                            </div>
+                                            
+                                            <div className="bg-gray-800/50 rounded-lg p-4">
+                                                <h4 className="font-semibold text-gray-300 mb-2">Feeding Opportunity</h4>
+                                                <p className="text-gray-200">
+                                                    Target will likely be alone or with minimal company between <strong>{Math.floor(Math.random() * 4) + 21}:00-{Math.floor(Math.random() * 4) + 1}:00</strong> when security is lightest.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="text-center mt-8 text-red-400 text-sm">
+                            <p>Remember: The Masquerade must be maintained at all costs.</p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<VentrueFeedingGenerator />, document.getElementById('root'));
+    </script>
+</body>
+</html>
