@@ -1,2369 +1,552 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Vampire: the Masquerade — The Sanctum</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:ital@0;1&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
-<style>
-/* ── Hub base ── */
-:root {
-  --blood: #8b0000; --blood-light: #c0392b; --blood-pale: #3d0000;
-  --gold: #c9a84c; --gold-light: #e8c97e; --ivory: #f0e6d3; --ivory-dim: #c8b99a;
-  --shadow: #0a0608; --dark: #110c0e; --panel: #1a1015; --panel-light: #221820;
-  --border: #3a2830; --hunger: #e74c3c; --text-dim: #7a6a72;
-  --green: #2ecc71; --green-dim: #27ae60;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--shadow); color: var(--ivory);
-  font-family: 'IM Fell English', Georgia, serif; min-height: 100vh;
-  background-image:
-    radial-gradient(ellipse at 20% 10%, rgba(139,0,0,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 90%, rgba(139,0,0,0.06) 0%, transparent 60%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  overflow-x: hidden;
-}
-
-/* ── Hub layout ── */
-#hub {
-  display: flex; flex-direction: column; align-items: center;
-  padding: 2rem 1rem 4rem;
-}
-header { text-align: center; margin-bottom: 2.5rem; width: 100%; max-width: 560px; }
-header::after { content: ''; display: block; width: 200px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 1rem auto 0; }
-.title-sub { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.35em; color: var(--gold); text-transform: uppercase; margin-bottom: 0.4rem; }
-h1 { font-family: 'Cinzel Decorative', serif; font-size: clamp(1.4rem, 5vw, 2.4rem); font-weight: 900; color: var(--ivory); line-height: 1.1; text-shadow: 0 0 40px rgba(139,0,0,0.6); }
-h1 span { color: var(--blood-light); }
-.card { background: var(--panel); border: 1px solid var(--border); border-radius: 4px; padding: 1.6rem; width: 100%; max-width: 560px; box-shadow: 0 8px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.03); }
-.card-title { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
-.card-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
-.tool-tile { display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: 3px; background: var(--panel-light); cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; width: 100%; text-align: left; margin-bottom: 0.6rem; }
-.tool-tile:last-child { margin-bottom: 0; }
-.tool-tile:hover { border-color: rgba(201,168,76,0.4); background: rgba(201,168,76,0.04); }
-.tool-tile:active { transform: scale(0.98); border-color: var(--blood-light); }
-.tool-icon { width: 44px; height: 44px; border-radius: 3px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; background: var(--panel); }
-.tool-info { flex: 1; }
-.tool-name { font-family: 'Cinzel', serif; font-size: 0.85rem; font-weight: 600; color: var(--ivory); margin-bottom: 2px; }
-.tool-desc { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.78rem; color: var(--text-dim); }
-.tool-arrow { font-size: 0.8rem; color: var(--text-dim); }
-
-/* ── App panels ── */
-.app-panel {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  padding: 0 1rem 4rem;
-  min-height: 100vh;
-}
-.back-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  width: 100%; max-width: 560px;
-  padding: 1rem 0 1.5rem;
-}
-.back-title { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
-.back-btn {
-  font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--text-dim); background: transparent; border: 1px solid var(--border);
-  border-radius: 2px; padding: 5px 12px; cursor: pointer;
-  -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: all 0.15s;
-}
-.back-btn:hover { border-color: var(--blood-light); color: var(--hunger); }
-.back-btn:active { transform: scale(0.95); }
-
-
-/* ── dice ── */
-
-  :root {
-    --blood: #8b0000;--blood-light: #c0392b;--blood-pale: #3d0000;--gold: #c9a84c;--gold-light: #e8c97e;--ivory: #f0e6d3;--ivory-dim: #c8b99a;--shadow: #0a0608;--dark: #110c0e;--panel: #1a1015;--panel-light: #221820;--border: #3a2830;--hunger: #e74c3c;--text-dim: #7a6a72;
-  }
-
-  #app-dice, #app-dice, #app-dice { box-sizing: border-box; margin: 0; padding: 0; }
-
-  #app-dice { background: var(--shadow); color: var(--ivory); font-family: 'IM Fell English', Georgia, serif; min-height: 100vh; background-image: radial-gradient(ellipse at 20% 10%, rgba(139,0,0,0.08) 0%, transparent 60%), radial-gradient(ellipse at 80% 90%, rgba(139,0,0,0.06) 0%, transparent 60%); display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem 4rem; }
-
-  #app-dice header { text-align: center; margin-bottom: 2.5rem; position: relative; }
-
-  #app-dice header::after { content: ''; display: block; width: 200px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 1rem auto 0; }
-
-  #app-dice .title-sub { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.35em; color: var(--gold); text-transform: uppercase; margin-bottom: 0.4rem; }
-
-  #app-dice h1 { font-family: 'Cinzel Decorative', serif; font-size: clamp(1.6rem, 5vw, 2.8rem); font-weight: 900; color: var(--ivory); line-height: 1.1; text-shadow: 0 0 40px rgba(139,0,0,0.6); letter-spacing: 0.02em; }
-
-  #app-dice h1 span { color: var(--blood-light); }
-
-  #app-dice .card { background: var(--panel); border: 1px solid var(--border); border-radius: 4px; padding: 1.6rem; width: 100%; max-width: 560px; box-shadow: 0 8px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.03); position: relative; }
-
-  #app-dice .card + .card { margin-top: 1rem; }
-
-  #app-dice .card-title { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
-
-  #app-dice .card-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
-
-  #app-dice .controls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.2rem; }
-
-  #app-dice .control-group label { display: block; font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.5rem; }
-
-  #app-dice .control-group.hunger label { color: var(--hunger); }
-
-  #app-dice .stepper { display: flex; align-items: center; gap: 4px; }
-
-  #app-dice .stepper input { flex: 1; background: var(--panel-light); border: 1px solid var(--border); border-radius: 3px; color: var(--ivory); font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 600; text-align: center; padding: 0.4rem 0.2rem; width: 100%; -moz-appearance: textfield; appearance: textfield; }
-
-  #app-dice .stepper input::-webkit-outer-spin-button, #app-dice .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; }
-
-  #app-dice .control-group.hunger .stepper input { color: var(--hunger); }
-
-  #app-dice .stepper input:focus { outline: none; border-color: var(--gold); }
-
-  #app-dice .step-btn { background: var(--panel-light); border: 1px solid var(--border); border-radius: 3px; color: var(--ivory-dim); cursor: pointer; width: 28px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: background 0.15s, color 0.15s, border-color 0.15s; flex-shrink: 0; }
-
-  #app-dice .step-btn:hover { background: var(--border); color: var(--gold); border-color: var(--gold); }
-
-  #app-dice .step-btn:active { transform: scale(0.95); }
-
-  #app-dice .btn-row { display: flex; gap: 0.6rem; }
-
-  #app-dice .btn { border: none; border-radius: 3px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.1em; padding: 0.75rem 1.2rem; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-
-  #app-dice .btn:active { transform: scale(0.97); }
-
-  #app-dice .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  #app-dice .btn-primary { flex: 1; background: linear-gradient(135deg, var(--blood) 0%, var(--blood-light) 100%); color: var(--ivory); text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.85rem; font-weight: 600; box-shadow: 0 4px 20px rgba(139,0,0,0.4); }
-
-  #app-dice .btn-primary:hover:not(:disabled) { box-shadow: 0 4px 28px rgba(192,57,43,0.6); filter: brightness(1.1); }
-
-  #app-dice .btn-secondary { background: var(--panel-light); border: 1px solid var(--border); color: var(--ivory-dim); }
-
-  #app-dice .btn-secondary:hover { border-color: var(--blood); color: var(--hunger); }
-
-  #app-dice .btn-rouse { background: transparent; border: 1px solid rgba(231,76,60,0.4); color: var(--hunger); }
-
-  #app-dice .btn-rouse:hover { background: rgba(231,76,60,0.08); border-color: var(--hunger); }
-
-  #app-dice .dice-section { margin-bottom: 0.8rem; }
-
-  #app-dice .dice-label { font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.5rem; }
-
-  #app-dice .dice-tray { display: flex; flex-wrap: wrap; gap: 8px; }
-
-  #app-dice .die { width: 40px; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 700; border: 2px solid; position: relative; transition: transform 0.15s; animation: dieIn 0.2s ease both; }
-
-  #app-dice .die:hover { transform: translateY(-2px) scale(1.05); }
-
-  @keyframes dieIn { from { transform: scale(0.5) rotate(-15deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
-  #app-dice .die-regular { background: var(--panel-light); }
-
-  #app-dice .die-regular.val-10 { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.1); }
-
-  #app-dice .die-regular.success { border-color: #27ae60; color: #2ecc71; background: rgba(46,204,113,0.08); }
-
-  #app-dice .die-regular.fail { border-color: var(--border); color: var(--text-dim); }
-
-  #app-dice .die-regular.val-1 { border-color: var(--border); color: var(--text-dim); }
-
-  #app-dice .die-hunger { background: rgba(139,0,0,0.15); }
-
-  #app-dice .die-hunger.val-10 { border-color: #e67e22; color: #e67e22; background: rgba(230,126,34,0.12); }
-
-  #app-dice .die-hunger.success { border-color: var(--hunger); color: var(--hunger); background: rgba(231,76,60,0.1); }
-
-  #app-dice .die-hunger.fail { border-color: rgba(231,76,60,0.3); color: rgba(231,76,60,0.5); }
-
-  #app-dice .die-hunger.val-1 { border-color: var(--blood-light); color: var(--blood-light); background: rgba(192,57,43,0.15); }
-
-  #app-dice .die-skull::after { content: '☠'; font-size: 0.7rem; position: absolute; bottom: -2px; right: 0px; opacity: 0.7; }
-
-  #app-dice .result-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; }
-
-  #app-dice .outcome-icon { width: 44px; height: 44px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-right: 0.75rem; flex-shrink: 0; }
-
-  #app-dice .outcome-text { flex: 1; }
-
-  #app-dice .outcome-name { font-family: 'Cinzel Decorative', serif; font-size: clamp(1rem, 3.5vw, 1.3rem); font-weight: 700; line-height: 1.2; }
-
-  #app-dice .outcome-desc { font-size: 0.8rem; color: var(--ivory-dim); font-style: italic; margin-top: 0.2rem; line-height: 1.4; }
-
-  #app-dice .outcome-count { text-align: right; }
-
-  #app-dice .count-big { font-family: 'Cinzel', serif; font-size: 3rem; font-weight: 700; line-height: 1; }
-
-  #app-dice .count-vs { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase; }
-
-  #app-dice .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 0.8rem 0; }
-
-  #app-dice .badges { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
-
-  #app-dice .badge { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.1em; padding: 0.2rem 0.6rem; border-radius: 20px; border: 1px solid; text-transform: uppercase; }
-
-  #app-dice .badge-neutral { border-color: var(--border); color: var(--text-dim); }
-
-  #app-dice .badge-gold { border-color: rgba(201,168,76,0.5); color: var(--gold); background: rgba(201,168,76,0.08); }
-
-  #app-dice .badge-green { border-color: rgba(46,204,113,0.4); color: #2ecc71; background: rgba(46,204,113,0.06); }
-
-  #app-dice .oc-bestial-failure { --oc: var(--blood-light); }
- #app-dice .oc-total-failure { --oc: #c0392b; }
- #app-dice .oc-failure { --oc: var(--text-dim); }
- #app-dice .oc-success { --oc: #2ecc71; }
- #app-dice .oc-messy-critical { --oc: #e67e22; }
- #app-dice .oc-critical { --oc: var(--gold); }
-
-  #app-dice .outcome-name { color: var(--oc); }
- #app-dice .count-big { color: var(--oc); }
-
-  #app-dice .outcome-icon { border: 1px solid var(--oc); color: var(--oc); }
-
-  #app-dice .rouse-card { display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.2rem; }
-
-  #app-dice .rouse-info { display: flex; align-items: center; gap: 0.75rem; }
-
-  #app-dice .rouse-title { font-family: 'Cinzel', serif; font-size: 0.9rem; font-weight: 600; }
-
-  #app-dice .rouse-sub { font-size: 0.75rem; color: var(--ivory-dim); font-style: italic; }
-
-  #app-dice .rouse-die { width: 44px; height: 44px; border-radius: 6px; border: 2px solid; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 700; }
-
-  #app-dice .rouse-win { border-color: #27ae60; color: #2ecc71; background: rgba(46,204,113,0.08); }
-
-  #app-dice .rouse-lose { border-color: var(--blood-light); color: var(--hunger); background: rgba(192,57,43,0.1); }
-
-  #app-dice .rouse-win-card { border-color: rgba(46,204,113,0.3); }
-
-  #app-dice .rouse-lose-card { border-color: rgba(192,57,43,0.3); }
-
-  #app-dice .history-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(58,40,48,0.5); font-size: 0.78rem; }
-
-  #app-dice .history-row:last-child { border-bottom: none; }
-
-  #app-dice .history-outcome { font-family: 'Cinzel', serif; font-size: 0.7rem; font-weight: 600; }
-
-  #app-dice .history-meta { font-size: 0.68rem; color: var(--text-dim); font-family: 'Cinzel', serif; }
-
-  @keyframes fadeSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  #app-dice .animate-in { animation: fadeSlide 0.25s ease both; }
-
-
-
-/* ── names ── */
-
-  :root {
-    --blood: #8b0000;
-    --blood-light: #c0392b;
-    --blood-pale: #3d0000;
-    --gold: #c9a84c;
-    --gold-light: #e8c97e;
-    --ivory: #f0e6d3;
-    --ivory-dim: #c8b99a;
-    --shadow: #0a0608;
-    --dark: #110c0e;
-    --panel: #1a1015;
-    --panel-light: #221820;
-    --border: #3a2830;
-    --hunger: #e74c3c;
-    --text-dim: #7a6a72;
-  }
-
-
-  #app-names, #app-names, #app-names { box-sizing: border-box; margin: 0; padding: 0; }
-
-
-  #app-names { scroll-behavior: smooth; }
-
-
-  #app-names {
-    background: var(--shadow);
-    color: var(--ivory);
-    font-family: 'IM Fell English', Georgia, serif;
-    min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse at 20% 10%, rgba(139,0,0,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 90%, rgba(139,0,0,0.06) 0%, transparent 60%),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem 1rem 4rem;
-    overflow-x: hidden;
-  }
-
-
-  #app-names /* ── Header ── */
-  header {
-    text-align: center;
-    margin-bottom: 2.5rem;
-    position: relative;
-    width: 100%;
-    max-width: 560px;
-  }
-
-  #app-names header::after {
-    content: '';
-    display: block;
-    width: 200px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    margin: 1rem auto 0;
-  }
-
-  #app-names .title-sub {
-    font-family: 'Cinzel', serif;
-    font-size: 0.7rem;
-    letter-spacing: 0.35em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 0.4rem;
-  }
-
-  #app-names h1 {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(1.4rem, 5vw, 2.4rem);
-    font-weight: 900;
-    color: var(--ivory);
-    line-height: 1.1;
-    text-shadow: 0 0 40px rgba(139,0,0,0.6);
-    letter-spacing: 0.02em;
-  }
-
-  #app-names h1 span { color: var(--blood-light); }
-
-
-  #app-names /* ── Card ── */
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 1.6rem;
-    width: 100%;
-    max-width: 560px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.03);
-    position: relative;
-  }
-
-  #app-names .card + .card { margin-top: 1rem; }
-
-
-  #app-names .card-title {
-    font-family: 'Cinzel', serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.3em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 1.2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  #app-names .card-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, var(--border), transparent);
-  }
-
-
-  #app-names /* ── Gender Segment ── */
-  .seg {
-    display: flex;
-    gap: 6px;
-    background: var(--panel-light);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 5px;
-    margin-bottom: 1.4rem;
-  }
-
-  #app-names .seg button {
-    flex: 1;
-    padding: 9px 4px;
-    font-family: 'Cinzel', serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    font-weight: 400;
-    border: 1px solid transparent;
-    background: transparent;
-    border-radius: 3px;
-    cursor: pointer;
-    color: var(--text-dim);
-    transition: all 0.15s;
-  }
-
-  #app-names .seg button.active {
-    background: var(--blood-pale);
-    border-color: rgba(139,0,0,0.6);
-    color: var(--ivory);
-  }
-
-  #app-names .seg button:active { transform: scale(0.96); }
-
-
-  #app-names /* ── Name Display ── */
-  .name-display {
-    text-align: center;
-    padding: 1.8rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--panel-light);
-    margin-bottom: 1.2rem;
-    min-height: 130px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  #app-names .name-display::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
-  }
-
-  #app-names .name-display::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
-  }
-
-
-  #app-names .name-first {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(1.8rem, 7vw, 2.8rem);
-    font-weight: 700;
-    color: var(--ivory);
-    line-height: 1;
-    text-shadow: 0 0 30px rgba(201,168,76,0.25);
-    transition: opacity 0.15s;
-  }
-
-  #app-names .name-last {
-    font-family: 'Cinzel', serif;
-    font-size: clamp(1rem, 4vw, 1.5rem);
-    font-weight: 600;
-    color: var(--gold);
-    letter-spacing: 0.08em;
-    transition: opacity 0.15s;
-  }
-
-  #app-names .name-placeholder {
-    font-family: 'IM Fell English', serif;
-    font-style: italic;
-    font-size: 0.9rem;
-    color: var(--text-dim);
-  }
-
-  #app-names .name-gender-tag {
-    font-family: 'Cinzel', serif;
-    font-size: 0.55rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-top: 4px;
-    border: 1px solid var(--border);
-    padding: 2px 10px;
-    border-radius: 20px;
-  }
-
-
-  #app-names .name-flash {
-    animation: nameReveal 0.3s ease both;
-  }
-
-  @keyframes nameReveal {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  #app-names /* ── Buttons ── */
-  .btn {
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-family: 'Cinzel', serif;
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
-    padding: 0.75rem 1.2rem;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  #app-names .btn:active { transform: scale(0.97); }
-
-
-  #app-names .btn-primary {
-    width: 100%;
-    background: linear-gradient(135deg, var(--blood) 0%, var(--blood-light) 100%);
-    color: var(--ivory);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    font-size: 0.85rem;
-    font-weight: 600;
-    box-shadow: 0 4px 20px rgba(139,0,0,0.4);
-    margin-bottom: 0.6rem;
-  }
-
-  #app-names .btn-primary:hover { box-shadow: 0 4px 28px rgba(192,57,43,0.6); filter: brightness(1.1); }
-
-  #app-names .btn-primary:active { box-shadow: 0 2px 10px rgba(139,0,0,0.5); }
-
-
-  #app-names .btn-row { display: flex; gap: 0.6rem; }
-
-
-  #app-names .btn-secondary {
-    flex: 1;
-    background: var(--panel-light);
-    border: 1px solid var(--border);
-    color: var(--ivory-dim);
-    font-size: 0.72rem;
-    padding: 0.65rem 0.5rem;
-  }
-
-  #app-names .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
-
-  #app-names .btn-secondary:active { border-color: var(--blood); color: var(--hunger); }
-
-
-  #app-names /* ── History ── */
-  .history-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.55rem 0;
-    border-bottom: 1px solid rgba(58,40,48,0.5);
-  }
-
-  #app-names .history-row:last-child { border-bottom: none; }
-
-  #app-names .history-name {
-    font-family: 'Cinzel', serif;
-    font-size: 0.75rem;
-    color: var(--ivory);
-  }
-
-  #app-names .history-gender {
-    font-family: 'Cinzel', serif;
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    border: 1px solid var(--border);
-    padding: 2px 8px;
-    border-radius: 20px;
-  }
-
-
-  #app-names /* ── Animations ── */
-  @keyframes fadeSlide {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  #app-names .animate-in { animation: fadeSlide 0.25s ease both; }
-
-
-  #app-names .divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border), transparent);
-    margin: 0.8rem 0;
-  }
-
-
-
-/* ── words ── */
-
-  :root {
-    --blood: #8b0000;
-    --blood-light: #c0392b;
-    --blood-pale: #3d0000;
-    --gold: #c9a84c;
-    --gold-light: #e8c97e;
-    --ivory: #f0e6d3;
-    --ivory-dim: #c8b99a;
-    --shadow: #0a0608;
-    --dark: #110c0e;
-    --panel: #1a1015;
-    --panel-light: #221820;
-    --border: #3a2830;
-    --hunger: #e74c3c;
-    --text-dim: #7a6a72;
-    --green: #2ecc71;
-    --green-dim: #27ae60;
-  }
-
-
-  #app-words, #app-words, #app-words { box-sizing: border-box; margin: 0; padding: 0; }
-
-
-  #app-words { scroll-behavior: smooth; }
-
-
-  #app-words {
-    background: var(--shadow);
-    color: var(--ivory);
-    font-family: 'IM Fell English', Georgia, serif;
-    min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse at 20% 10%, rgba(139,0,0,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 90%, rgba(139,0,0,0.06) 0%, transparent 60%),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem 1rem 4rem;
-    overflow-x: hidden;
-  }
-
-
-  #app-words /* ── Header ── */
-  header {
-    text-align: center;
-    margin-bottom: 2.5rem;
-    position: relative;
-    width: 100%;
-    max-width: 560px;
-  }
-
-  #app-words header::after {
-    content: '';
-    display: block;
-    width: 200px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    margin: 1rem auto 0;
-  }
-
-  #app-words .title-sub {
-    font-family: 'Cinzel', serif;
-    font-size: 0.7rem;
-    letter-spacing: 0.35em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 0.4rem;
-  }
-
-  #app-words h1 {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(1.4rem, 5vw, 2.4rem);
-    font-weight: 900;
-    color: var(--ivory);
-    line-height: 1.1;
-    text-shadow: 0 0 40px rgba(139,0,0,0.6);
-    letter-spacing: 0.02em;
-  }
-
-  #app-words h1 span { color: var(--blood-light); }
-
-
-  #app-words /* ── Card ── */
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 1.6rem;
-    width: 100%;
-    max-width: 560px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.03);
-    position: relative;
-  }
-
-  #app-words .card + .card { margin-top: 1rem; }
-
-
-  #app-words .card-title {
-    font-family: 'Cinzel', serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.3em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 1.2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  #app-words .card-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, var(--border), transparent);
-  }
-
-
-  #app-words /* ── Word Count ── */
-  .count-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1.2rem;
-  }
-
-  #app-words .count-label {
-    font-family: 'Cinzel', serif;
-    font-size: 0.6rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    flex-shrink: 0;
-  }
-
-  #app-words .stepper {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex: 1;
-  }
-
-  #app-words .stepper input {
-    flex: 1;
-    background: var(--panel-light);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    color: var(--ivory);
-    font-family: 'Cinzel', serif;
-    font-size: 1.1rem;
-    font-weight: 600;
-    text-align: center;
-    padding: 0.4rem 0.2rem;
-    -moz-appearance: textfield;
-    appearance: textfield;
-  }
-
-  #app-words .stepper input::-webkit-outer-spin-button, #app-words .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; }
-
-  #app-words .stepper input:focus { outline: none; border-color: var(--gold); }
-
-  #app-words .step-btn {
-    background: var(--panel-light);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    color: var(--ivory-dim);
-    cursor: pointer;
-    width: 32px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
-    flex-shrink: 0;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  #app-words .step-btn:hover { background: var(--border); color: var(--gold); border-color: var(--gold); }
-
-  #app-words .step-btn:active { transform: scale(0.93); }
-
-
-  #app-words /* ── Category Section ── */
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.8rem;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    padding: 2px 0;
-  }
-
-  #app-words .section-name {
-    font-family: 'Cinzel', serif;
-    font-size: 0.7rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--gold);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  #app-words .section-arrow {
-    font-size: 0.6rem;
-    color: var(--text-dim);
-    transition: transform 0.2s;
-  }
-
-  #app-words .section-arrow.open { transform: rotate(180deg); }
-
-
-  #app-words .section-mini-btns {
-    display: flex;
-    gap: 5px;
-  }
-
-  #app-words .mini-btn {
-    font-family: 'Cinzel', serif;
-    font-size: 0.55rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: all 0.15s;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  #app-words .mini-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-  #app-words .mini-btn:active { transform: scale(0.95); }
-
-
-  #app-words .checkbox-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    overflow: hidden;
-    transition: max-height 0.25s ease, opacity 0.2s;
-    max-height: 400px;
-    opacity: 1;
-    margin-bottom: 0.4rem;
-  }
-
-  #app-words .checkbox-group.collapsed {
-    max-height: 0;
-    opacity: 0;
-  }
-
-
-  #app-words .checkbox-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    padding: 8px 10px;
-    border: 1px solid transparent;
-    border-radius: 3px;
-    transition: background 0.15s, border-color 0.15s;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  #app-words .checkbox-label:hover { background: rgba(139,0,0,0.08); border-color: rgba(139,0,0,0.2); }
-
-  #app-words .checkbox-label input[type="checkbox"] {
-    margin-right: 10px;
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    accent-color: var(--blood-light);
-    flex-shrink: 0;
-  }
-
-  #app-words .checkbox-label span {
-    font-family: 'IM Fell English', serif;
-    color: var(--ivory-dim);
-    font-size: 0.9rem;
-    text-transform: capitalize;
-  }
-
-  #app-words .checkbox-label:has(input:checked) span { color: var(--ivory); }
-
-
-  #app-words .divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border), transparent);
-    margin: 1rem 0;
-  }
-
-
-  #app-words /* ── Master row ── */
-  .master-row {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1.2rem;
-  }
-
-  #app-words .master-btn {
-    flex: 1;
-    padding: 8px 4px;
-    font-family: 'Cinzel', serif;
-    font-size: 0.6rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: all 0.15s;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  #app-words .master-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-  #app-words .master-btn:active { transform: scale(0.96); }
-
-
-  #app-words /* ── Buttons ── */
-  .btn {
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-family: 'Cinzel', serif;
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
-    padding: 0.75rem 1.2rem;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  #app-words .btn:active { transform: scale(0.97); }
-
-
-  #app-words .btn-primary {
-    width: 100%;
-    background: linear-gradient(135deg, var(--blood) 0%, var(--blood-light) 100%);
-    color: var(--ivory);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    font-size: 0.85rem;
-    font-weight: 600;
-    box-shadow: 0 4px 20px rgba(139,0,0,0.4);
-    margin-top: 1.2rem;
-  }
-
-  #app-words .btn-primary:hover { box-shadow: 0 4px 28px rgba(192,57,43,0.6); filter: brightness(1.1); }
-
-  #app-words .btn-primary:active { box-shadow: 0 2px 10px rgba(139,0,0,0.5); }
-
-
-  #app-words .btn-copy {
-    width: 100%;
-    background: var(--panel-light);
-    border: 1px solid var(--border);
-    color: var(--ivory-dim);
-    font-size: 0.72rem;
-    padding: 0.65rem;
-    margin-top: 0.6rem;
-  }
-
-  #app-words .btn-copy:hover { border-color: var(--gold); color: var(--gold); }
-
-  #app-words .btn-copy.copied { border-color: var(--green-dim); color: var(--green); }
-
-
-  #app-words /* ── Results ── */
-  .word-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  #app-words .word-tag {
-    font-family: 'Cinzel', serif;
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-    color: var(--gold);
-    border: 1px solid rgba(201,168,76,0.35);
-    background: rgba(201,168,76,0.06);
-    padding: 6px 14px;
-    border-radius: 20px;
-    animation: tagIn 0.2s ease both;
-  }
-
-  @keyframes tagIn {
-    from { opacity: 0; transform: scale(0.85); }
-    to   { opacity: 1; transform: scale(1); }
-  }
-
-  #app-words .copy-text {
-    font-family: 'IM Fell English', serif;
-    font-style: italic;
-    font-size: 0.8rem;
-    color: var(--text-dim);
-    margin-top: 0.8rem;
-    padding: 0.6rem 0.8rem;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    background: var(--panel-light);
-    word-break: break-word;
-    line-height: 1.5;
-  }
-
-
-  #app-words .empty-state {
-    font-family: 'IM Fell English', serif;
-    font-style: italic;
-    color: var(--text-dim);
-    text-align: center;
-    padding: 2rem 0;
-    font-size: 0.95rem;
-  }
-
-
-  @keyframes fadeSlide {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  #app-words .animate-in { animation: fadeSlide 0.25s ease both; }
-
-
-
-
-/* ── oracle styles ── */
-
-  :root {
-    --blood: #8B0000;
-    --blood-bright: #C41E3A;
-    --ash: #1a1a1a;
-    --stone: #2a2520;
-    --parchment: #c9b99a;
-    --parchment-dim: #7a6e5f;
-    --gold: #b8963e;
-    --gold-dim: #6b5425;
-    --fog: #3d3530;
-  }
-
-
-  #app-oracle { margin: 0; padding: 0; box-sizing: border-box; }
-
-
-  #app-oracle {
-    background-color: var(--ash);
-    color: var(--parchment);
-    font-family: 'Cormorant Garamond', serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-  }
-
-
-  #app-oracle body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: 
-      radial-gradient(ellipse at 20% 50%, rgba(139,0,0,0.06) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 20%, rgba(184,150,62,0.04) 0%, transparent 50%),
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-  }
-
-
-  #app-oracle .container {
-    position: relative;
-    z-index: 1;
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 48px 24px 80px;
-  }
-
-
-  #app-oracle .header {
-    text-align: center;
-    margin-bottom: 56px;
-  }
-
-
-  #app-oracle .header-rule {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 20px;
-  }
-
-
-  #app-oracle .header-rule::before, #app-oracle .header-rule::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
-  }
-
-
-  #app-oracle .header-ornament {
-    color: var(--blood-bright);
-    font-size: 18px;
-    letter-spacing: 8px;
-  }
-
-
-  #app-oracle h1 {
-    font-size: clamp(2.4rem, 6vw, 3.6rem);
-    font-weight: 300;
-    letter-spacing: 0.15em;
-    line-height: 1;
-    color: var(--parchment);
-    text-transform: uppercase;
-  }
-
-
-  #app-oracle .subtitle {
-    font-family: 'Courier Prime', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.25em;
-    color: var(--parchment-dim);
-    text-transform: uppercase;
-    margin-top: 10px;
-  }
-
-
-  #app-oracle .section {
-    margin-bottom: 44px;
-  }
-
-
-  #app-oracle .section-label {
-    font-family: 'Courier Prime', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-
-  #app-oracle .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, var(--gold-dim), transparent);
-  }
-
-
-  #app-oracle .dice-group {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-
-
-  #app-oracle .dice-btn {
-    background: transparent;
-    border: 1px solid var(--fog);
-    color: var(--parchment-dim);
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1rem;
-    font-weight: 300;
-    letter-spacing: 0.1em;
-    padding: 12px 8px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    position: relative;
-    overflow: hidden;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-
-  #app-oracle .dice-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--blood);
-    transform: scaleY(0);
-    transform-origin: bottom;
-    transition: transform 0.25s ease;
-    z-index: 0;
-  }
-
-
-  #app-oracle .dice-btn span { position: relative; z-index: 1; }
-
-
-  #app-oracle .dice-btn:hover { border-color: var(--blood-bright); color: var(--parchment); }
-
-  #app-oracle .dice-btn:hover::before { transform: scaleY(1); }
-
-
-  #app-oracle .dice-btn.active {
-    border-color: var(--blood-bright);
-    color: var(--parchment);
-    background: var(--blood);
-  }
-
-
-  #app-oracle .mood-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-
-
-  #app-oracle .mood-btn {
-    background: transparent;
-    border: 1px solid var(--fog);
-    color: var(--parchment-dim);
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 0.95rem;
-    font-style: italic;
-    padding: 10px 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: left;
-    letter-spacing: 0.05em;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-
-  #app-oracle .mood-btn:hover { border-color: var(--gold-dim); color: var(--parchment); }
-
-  #app-oracle .mood-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(184,150,62,0.06); }
-
-
-  #app-oracle .roll-area {
-    text-align: center;
-    margin: 44px 0;
-  }
-
-
-  #app-oracle .roll-btn {
-    background: transparent;
-    border: 1px solid var(--blood-bright);
-    color: var(--parchment);
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.1rem;
-    font-weight: 300;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    padding: 16px 48px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-
-  #app-oracle .roll-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--blood);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease;
-    z-index: 0;
-  }
-
-
-  #app-oracle .roll-btn span { position: relative; z-index: 1; }
-
-
-  #app-oracle .roll-btn:hover::before { transform: scaleX(1); }
-
-  #app-oracle .roll-btn:active { transform: scale(0.98); }
-
-
-  #app-oracle .output {
-    min-height: 180px;
-    border: 1px solid var(--fog);
-    padding: 28px 32px;
-    position: relative;
-    transition: opacity 0.3s ease;
-  }
-
-
-  #app-oracle .output::before {
-    content: '';
-    position: absolute;
-    top: -1px; left: 32px;
-    width: 48px; height: 1px;
-    background: var(--ash);
-  }
-
-
-  #app-oracle .output-empty {
-    color: var(--parchment-dim);
-    font-style: italic;
-    font-size: 1rem;
-    line-height: 1.7;
-  }
-
-
-  #app-oracle .result-dice {
-    font-family: 'Courier Prime', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
-    color: var(--gold-dim);
-    text-transform: uppercase;
-    margin-bottom: 16px;
-  }
-
-
-  #app-oracle .result-answer {
-    font-size: 1.25rem;
-    font-weight: 400;
-    color: var(--parchment);
-    line-height: 1.5;
-    margin-bottom: 12px;
-  }
-
-
-  #app-oracle .result-answer.yes { color: #c9d4b5; }
-
-  #app-oracle .result-answer.yes-and { color: #d4c9b5; }
-
-  #app-oracle .result-answer.yes-but { color: var(--parchment); }
-
-  #app-oracle .result-answer.no-but { color: #b5c0c9; }
-
-  #app-oracle .result-answer.no { color: #c9b5b5; }
-
-  #app-oracle .result-answer.no-and { color: var(--blood-bright); }
-
-
-  #app-oracle .result-detail {
-    font-size: 0.95rem;
-    font-style: italic;
-    color: var(--parchment-dim);
-    line-height: 1.65;
-    border-left: 2px solid var(--fog);
-    padding-left: 16px;
-    margin-bottom: 16px;
-  }
-
-
-  #app-oracle .result-complication {
-    font-family: 'Courier Prime', monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    color: var(--blood-bright);
-    text-transform: uppercase;
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid var(--fog);
-  }
-
-
-  #app-oracle .result-complication::before { content: 'COMPLICATION: '; }
-
-
-  #app-oracle .complication-pool {
-    margin-top: 44px;
-  }
-
-
-  #app-oracle .pool-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-
-  #app-oracle .pool-item {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(61,53,48,0.5);
-    font-size: 0.95rem;
-    color: var(--parchment-dim);
-    transition: color 0.2s;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-
-  #app-oracle .pool-item:hover { color: var(--parchment); }
-
-
-  #app-oracle .pool-item.resolved {
-    text-decoration: line-through;
-    color: var(--fog);
-  }
-
-
-  #app-oracle .pool-num {
-    font-family: 'Courier Prime', monospace;
-    font-size: 0.6rem;
-    color: var(--gold-dim);
-    min-width: 24px;
-  }
-
-
-  #app-oracle .pool-add {
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
-  }
-
-
-  #app-oracle .pool-input {
-    flex: 1;
-    background: transparent;
-    border: 1px solid var(--fog);
-    border-right: none;
-    color: var(--parchment);
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 0.95rem;
-    font-style: italic;
-    padding: 8px 14px;
-    outline: none;
-  }
-
-
-  #app-oracle .pool-input::placeholder { color: var(--fog); }
-
-  #app-oracle .pool-input:focus { border-color: var(--gold-dim); }
-
-
-  #app-oracle .pool-add-btn {
-    background: transparent;
-    border: 1px solid var(--fog);
-    color: var(--parchment-dim);
-    font-family: 'Courier Prime', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.15em;
-    padding: 8px 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-transform: uppercase;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-
-  #app-oracle .pool-add-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
-
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-
-  #app-oracle .animate-in {
-    animation: fadeUp 0.35s ease forwards;
-  }
-
-
-  #app-oracle .divider {
-    border: none;
-    border-top: 1px solid var(--fog);
-    margin: 44px 0;
-  }
-
-
-  #app-oracle .hint {
-    font-family: 'Courier Prime', monospace;
-    font-size: 0.62rem;
-    letter-spacing: 0.15em;
-    color: var(--fog);
-    text-transform: uppercase;
-    text-align: center;
-    margin-top: -32px;
-    margin-bottom: 44px;
-  }
-
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rosa's Ventrue Feeding Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'IM Fell English', serif;
+            background: linear-gradient(135deg, #1a0000 0%, #0a0000 50%, #1a0000 100%);
+            color: #f5f5dc;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #d4af37;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #8b0000;
+            font-style: italic;
+        }
+        
+        .card {
+            background: linear-gradient(to bottom, #2a0000, #1a0000);
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+        
+        .card-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.5rem;
+            color: #d4af37;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #d4af37;
+        }
+        
+        .card-text {
+            color: #f5f5dc;
+            margin-bottom: 16px;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        @media (min-width: 768px) {
+            .checkbox-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        .checkbox-label:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+        
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #8b0000;
+        }
+        
+        .checkbox-text {
+            font-size: 0.95rem;
+        }
+        
+        .checkbox-text-active {
+            color: #d4af37;
+            font-weight: bold;
+        }
+        
+        .checkbox-text-inactive {
+            color: #999;
+        }
+        
+        .warning {
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(139, 0, 0, 0.3);
+            border: 1px solid #8b0000;
+            border-radius: 4px;
+            color: #ff6b6b;
+            font-size: 0.95rem;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .input-wrapper {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .label {
+            display: block;
+            color: #d4af37;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .input {
+            width: 100%;
+            padding: 12px;
+            background: #0a0000;
+            border: 2px solid #d4af37;
+            border-radius: 4px;
+            color: #f5f5dc;
+            font-family: 'IM Fell English', serif;
+            font-size: 1rem;
+        }
+        
+        .input:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+        }
+        
+        .input::placeholder {
+            color: #666;
+        }
+        
+        .button {
+            padding: 12px 24px;
+            background: linear-gradient(to bottom, #8b0000, #5a0000);
+            color: #d4af37;
+            border: 2px solid #d4af37;
+            border-radius: 4px;
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        
+        .button:hover:not(:disabled) {
+            background: linear-gradient(to bottom, #a00000, #6a0000);
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        .button:disabled {
+            background: #333;
+            border-color: #666;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .target-grid {
+            display: grid;
+            gap: 24px;
+        }
+        
+        @media (min-width: 768px) {
+            .target-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .target-name {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.8rem;
+            color: #d4af37;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #d4af37;
+        }
+        
+        .info-row {
+            margin-bottom: 12px;
+            color: #f5f5dc;
+            line-height: 1.6;
+        }
+        
+        .info-label {
+            color: #d4af37;
+            font-weight: bold;
+        }
+        
+        .associate-box {
+            background: rgba(75, 0, 130, 0.3);
+            border: 1px solid #8b008b;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .associate-text {
+            color: #dda0dd;
+            font-size: 0.95rem;
+        }
+        
+        .associate-subtext {
+            color: #ba55d3;
+            font-size: 0.85rem;
+            margin-top: 4px;
+            font-style: italic;
+        }
+        
+        .fame-box {
+            background: rgba(139, 0, 0, 0.2);
+            border: 1px solid #8b0000;
+            border-radius: 4px;
+            padding: 8px;
+            margin: 8px 0;
+            color: #f5f5dc;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+        
+        .stars {
+            color: #ffd700;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+        
+        .story-section-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.3rem;
+            color: #d4af37;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #d4af37;
+        }
+        
+        .story-box {
+            background: rgba(139, 0, 0, 0.2);
+            border-left: 3px solid #8b0000;
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .story-title {
+            color: #d4af37;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .story-text {
+            color: #f5f5dc;
+            line-height: 1.6;
+        }
+        
+        .complication-box {
+            background: rgba(184, 134, 11, 0.2);
+            border-left: 3px solid #b8860b;
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .complication-title {
+            color: #daa520;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .complication-text {
+            color: #f5f5dc;
+            line-height: 1.6;
+        }
+        
+        .opportunity-box {
+            background: rgba(212, 175, 55, 0.1);
+            border-left: 3px solid #d4af37;
+            border-radius: 4px;
+            padding: 16px;
+        }
+        
+        .opportunity-title {
+            color: #d4af37;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .opportunity-text {
+            color: #f5f5dc;
+            line-height: 1.6;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 32px;
+            color: #8b0000;
+            font-size: 0.95rem;
+            font-style: italic;
+            padding: 16px;
+            border-top: 1px solid #d4af37;
+        }
+    </style>
 </head>
 <body>
-
-<!-- Hub -->
-<div id="hub">
-  <header>
-    <p class="title-sub">Vampire: the Masquerade</p>
-    <h1>The <span>Sanctum</span></h1>
-  </header>
-  <div class="card">
-    <div class="card-title">🩸 Toolbox</div>
-    <button class="tool-tile" onclick="showApp('dice')">
-      <div class="tool-icon">⚄</div>
-      <div class="tool-info">
-        <div class="tool-name">Blood &amp; Dice</div>
-        <div class="tool-desc">V5 dice roller with hunger, rouse checks &amp; history</div>
-      </div>
-      <span class="tool-arrow">›</span>
-    </button>
-    <button class="tool-tile" onclick="showApp('names')">
-      <div class="tool-icon">✦</div>
-      <div class="tool-info">
-        <div class="tool-name">Mortal Names</div>
-        <div class="tool-desc">Canadian character name generator for fiction writers</div>
-      </div>
-      <span class="tool-arrow">›</span>
-    </button>
-    <button class="tool-tile" onclick="showApp('words')">
-      <div class="tool-icon">♛</div>
-      <div class="tool-info">
-        <div class="tool-name">Word Oracle</div>
-        <div class="tool-desc">Random word generator across grammar, genre &amp; resonance</div>
-      </div>
-      <span class="tool-arrow">›</span>
-    </button>
-    <button class="tool-tile" onclick="showApp('oracle')">
-      <div class="tool-icon">&#10022;</div>
-      <div class="tool-info">
-        <div class="tool-name">Tour Oracle</div>
-        <div class="tool-desc">GM-less yes/no oracle with complications for Tattered Façade</div>
-      </div>
-      <span class="tool-arrow">&#8250;</span>
-    </button>
-  </div>
-</div>
-
-<!-- App panels (hidden until launched) -->
-
-<div id="app-dice" class="app-panel" style="display:none">
-  <div class="back-bar">
-    <span class="back-title">Blood & Dice</span>
-    <button class="back-btn" onclick="showHub()">← Back</button>
-  </div>
-  <header>
-  <p class="title-sub">Vampire: the Masquerade 5th Edition</p>
-  <h1>Blood &amp; <span>Dice</span></h1>
-</header>
-<div class="card" id="controls-card">
-  <div class="card-title">⚄ Configure Your Roll</div>
-  <div class="controls-grid">
-    <div class="control-group">
-      <label>Dice Pool</label>
-      <div class="stepper">
-        <button class="step-btn" onclick="VTM_Dice.adjust('pool',-1)">−</button>
-        <input type="number" id="pool" min="1" max="30" value="5" oninput="VTM_Dice.clamp(this,1,30)">
-        <button class="step-btn" onclick="VTM_Dice.adjust('pool',1)">+</button>
-      </div>
-    </div>
-    <div class="control-group hunger">
-      <label>🩸 Hunger</label>
-      <div class="stepper">
-        <button class="step-btn" onclick="VTM_Dice.adjust('hunger',-1)">−</button>
-        <input type="number" id="hunger" min="0" max="5" value="1" oninput="VTM_Dice.clamp(this,0,5)">
-        <button class="step-btn" onclick="VTM_Dice.adjust('hunger',1)">+</button>
-      </div>
-    </div>
-    <div class="control-group">
-      <label>Difficulty</label>
-      <div class="stepper">
-        <button class="step-btn" onclick="VTM_Dice.adjust('difficulty',-1)">−</button>
-        <input type="number" id="difficulty" min="1" max="15" value="3" oninput="VTM_Dice.clamp(this,1,15)">
-        <button class="step-btn" onclick="VTM_Dice.adjust('difficulty',1)">+</button>
-      </div>
-    </div>
-  </div>
-  <div class="btn-row">
-    <button class="btn btn-primary" id="roll-btn" onclick="VTM_Dice.doRoll()">⚄ Roll Dice</button>
-    <button class="btn btn-rouse" onclick="VTM_Dice.doRouse()" title="Rouse Check">🩸</button>
-    <button class="btn btn-secondary" id="reroll-btn" onclick="VTM_Dice.doRoll()" title="Re-roll" style="display:none">↺</button>
-  </div>
-</div>
-<div class="card animate-in" id="rouse-card" style="display:none; max-width:560px; width:100%;"><div class="rouse-card" id="rouse-content"></div></div>
-<div class="card animate-in" id="result-card" style="display:none; max-width:560px; width:100%;"><div id="result-content"></div></div>
-<div class="card" id="history-card" style="display:none; max-width:560px; width:100%; margin-top:1rem;">
-  <div class="card-title">📜 Roll History</div>
-  <div id="history-list"></div>
-</div>
-</div>
-
-<div id="app-names" class="app-panel" style="display:none">
-  <div class="back-bar">
-    <span class="back-title">Mortal Names</span>
-    <button class="back-btn" onclick="showHub()">← Back</button>
-  </div>
-  <header>
-  <p class="title-sub">Vampire: the Masquerade</p>
-  <h1>Mortal <span>Names</span></h1>
-</header>
-
-<!-- Generator Card -->
-<div class="card">
-  <div class="card-title">✦ Character Identity</div>
-
-  <div class="seg" id="gender-seg">
-    <button class="active" onclick="VTM_Names.setGender('m', this)">Men</button>
-    <button onclick="VTM_Names.setGender('f', this)">Women</button>
-    <button onclick="VTM_Names.setGender('nb', this)">Non-binary</button>
-  </div>
-
-  <div class="name-display" id="name-display">
-    <div class="name-placeholder">Awaiting the blood…</div>
-  </div>
-
-  <button class="btn btn-primary" onclick="VTM_Names.generate()">⚔ Reveal a Name</button>
-
-  <div class="btn-row">
-    <button class="btn btn-secondary" onclick="VTM_Names.newFirst()">↺ New First Name</button>
-    <button class="btn btn-secondary" onclick="VTM_Names.newLast()">↺ New Surname</button>
-  </div>
-</div>
-
-<!-- History Card -->
-<div class="card animate-in" id="history-card" style="display:none; margin-top: 1rem;">
-  <div class="card-title">📜 Name Registry</div>
-  <div id="history-list"></div>
-</div>
-</div>
-
-<div id="app-words" class="app-panel" style="display:none">
-  <div class="back-bar">
-    <span class="back-title">Word Oracle</span>
-    <button class="back-btn" onclick="showHub()">← Back</button>
-  </div>
-  <header>
-  <p class="title-sub">Vampire: the Masquerade</p>
-  <h1>Word <span>Oracle</span></h1>
-</header>
-
-<!-- Word Count Card -->
-<div class="card">
-  <div class="card-title">⚄ Configuration</div>
-
-  <div class="count-row">
-    <span class="count-label">Words</span>
-    <div class="stepper">
-      <button class="step-btn" onclick="VTM_Words.adjust(-1)">−</button>
-      <input type="number" id="wordCount" min="1" max="10" value="5">
-      <button class="step-btn" onclick="VTM_Words.adjust(1)">+</button>
-    </div>
-  </div>
-
-  <div class="master-row">
-    <button class="master-btn" onclick="VTM_Words.masterSelect(true)">✦ Select All</button>
-    <button class="master-btn" onclick="VTM_Words.masterSelect(false)">✕ Unselect All</button>
-  </div>
-
-  <!-- Grammatical -->
-  <div class="section-header" onclick="VTM_Words.toggleSection('grammatical')">
-    <span class="section-name">⚔ Grammatical</span>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div class="section-mini-btns" onclick="event.stopPropagation()">
-        <button class="mini-btn" onclick="VTM_Words.sectionSelect('grammatical',true)">All</button>
-        <button class="mini-btn" onclick="VTM_Words.sectionSelect('grammatical',false)">None</button>
-      </div>
-      <span class="section-arrow open" id="arrow-grammatical">▼</span>
-    </div>
-  </div>
-  <div class="checkbox-group" id="group-grammatical"></div>
-  <div class="divider"></div>
-
-  <!-- Academic -->
-  <div class="section-header" onclick="VTM_Words.toggleSection('academic')">
-    <span class="section-name">📜 Academic</span>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div class="section-mini-btns" onclick="event.stopPropagation()">
-        <button class="mini-btn" onclick="VTM_Words.sectionSelect('academic',true)">All</button>
-        <button class="mini-btn" onclick="VTM_Words.sectionSelect('academic',false)">None</button>
-      </div>
-      <span class="section-arrow open" id="arrow-academic">▼</span>
-    </div>
-  </div>
-  <div class="checkbox-group" id="group-academic"></div>
-  <div class="divider"></div>
-
-  <!-- Genre -->
-  <div class="section-header" onclick="VTM_Words.toggleSection('genre')">
-    <span class="section-name">🩸 Genre</span>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div class="section-mini-btns" onclick="event.stopPropagation()">
-        <button class="mini-btn" onclick="VTM_Words.sectionSelect('genre',true)">All</button>
-        <button class="mini-btn" onclick="VTM_Words.sectionSelect('genre',false)">None</button>
-      </div>
-      <span class="section-arrow open" id="arrow-genre">▼</span>
-    </div>
-  </div>
-  <div class="checkbox-group" id="group-genre"></div>
-  <div class="divider"></div>
-
-  <!-- Resonance -->
-  <div class="section-header" onclick="VTM_Words.toggleSection('resonance')">
-    <span class="section-name">♛ Resonance</span>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div class="section-mini-btns" onclick="event.stopPropagation()">
-        <button class="mini-btn" onclick="VTM_Words.sectionSelect('resonance',true)">All</button>
-        <button class="mini-btn" onclick="VTM_Words.sectionSelect('resonance',false)">None</button>
-      </div>
-      <span class="section-arrow open" id="arrow-resonance">▼</span>
-    </div>
-  </div>
-  <div class="checkbox-group" id="group-resonance"></div>
-
-  <button class="btn btn-primary" onclick="VTM_Words.generate()">⚡ Generate Words</button>
-</div>
-
-<!-- Results Card -->
-<div class="card animate-in" id="results-card" style="display:none; margin-top:1rem;">
-  <div class="card-title">✦ Generated Words</div>
-  <div id="word-output"><div class="empty-state">Words will appear here…</div></div>
-  <div id="copy-text-block" style="display:none">
-    <div class="copy-text" id="copy-text"></div>
-    <button class="btn btn-copy" id="copy-btn" onclick="VTM_Words.copyWords()">📋 Copy to Clipboard</button>
-  </div>
-</div>
-</div>
-
-<div id="app-oracle" class="app-panel">
-  <div class="back-bar">
-    <span class="back-title">Tour Oracle</span>
-    <button class="back-btn" onclick="showHub()">&#8592; Back</button>
-  </div>
-  <div class="container">
-
-  <div class="header">
-    <div class="header-rule">
-      <span class="header-ornament">✦ ✦ ✦</span>
-    </div>
-    <h1>The Tour Oracle</h1>
-    <p class="subtitle">A GM-less companion for Tattered Façade</p>
-  </div>
-
-  <div class="section">
-    <div class="section-label">I. Question Tier</div>
-    <div class="dice-group">
-      <button class="dice-btn active" onclick="VTM_Oracle.setTier(1, this)"><span>• Current Events</span></button>
-      <button class="dice-btn" onclick="VTM_Oracle.setTier(2, this)"><span>•• Residents &amp; Groups</span></button>
-      <button class="dice-btn" onclick="VTM_Oracle.setTier(3, this)"><span>••• Secrets &amp; Lies</span></button>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-label">II. Site Mood (optional)</div>
-    <div class="mood-grid">
-      <button class="mood-btn" onclick="VTM_Oracle.setMood('tense', this)">Tense</button>
-      <button class="mood-btn" onclick="VTM_Oracle.setMood('celebratory', this)">Celebratory</button>
-      <button class="mood-btn" onclick="VTM_Oracle.setMood('deserted', this)">Deserted</button>
-      <button class="mood-btn" onclick="VTM_Oracle.setMood('chaotic', this)">Chaotic</button>
-      <button class="mood-btn" onclick="VTM_Oracle.setMood('mournful', this)">Mournful</button>
-      <button class="mood-btn" onclick="VTM_Oracle.setMood('conspiratorial', this)">Conspiratorial</button>
-      <button class="mood-btn" onclick="VTM_Oracle.setMood('predatory', this)">Predatory</button>
-      <button class="mood-btn" onclick="VTM_Oracle.setMood('oblivious', this)">Oblivious</button>
-    </div>
-  </div>
-
-  <div class="roll-area">
-    <button class="roll-btn" onclick="VTM_Oracle.rollOracle()"><span>Consult the Dark</span></button>
-  </div>
-
-  <p class="hint">Tap a complication to mark it resolved</p>
-
-  <div class="section">
-    <div class="section-label">III. The Answer</div>
-    <div class="output" id="oracle-output">
-      <p class="output-empty">The night has not yet spoken. Set your question tier and consult the oracle above.</p>
-    </div>
-  </div>
-
-  <hr class="divider">
-
-  <div class="complication-pool">
-    <div class="section-label">IV. Simmering Complications</div>
-    <ul class="pool-list" id="oracle-pool-list"></ul>
-    <div class="pool-add">
-      <input class="pool-input" id="oracle-pool-input" type="text" placeholder="Note a complication, NPC, or hook...">
-      <button class="pool-add-btn" onclick="VTM_Oracle.addComplication()">Add</button>
-    </div>
-  </div>
-
-</div>
-</div>
-
-
-<script>
-function showApp(id) {
-  if (navigator.vibrate) navigator.vibrate([10, 30, 20]);
-  document.getElementById('hub').style.display = 'none';
-  document.querySelectorAll('.app-panel').forEach(function(p){ p.style.display = 'none'; });
-  document.getElementById('app-' + id).style.display = 'flex';
-  window.scrollTo(0, 0);
-}
-function showHub() {
-  if (navigator.vibrate) navigator.vibrate(8);
-  document.querySelectorAll('.app-panel').forEach(function(p){ p.style.display = 'none'; });
-  document.getElementById('hub').style.display = 'flex';
-  window.scrollTo(0, 0);
-}
-
-var VTM_Dice=(function(){
-function d10(){return Math.floor(Math.random()*10)+1;}
-function rollV5(pool,hungerCount,difficulty){const hunger=Math.min(hungerCount,pool);const regular=pool-hunger;const dice=[];for(let i=0;i<regular;i++)dice.push({value:d10(),isHunger:false});for(let i=0;i<hunger;i++)dice.push({value:d10(),isHunger:true});const tens=dice.filter(d=>d.value===10);const regularSuccesses=dice.filter(d=>d.value>=6&&d.value<=9).length;const critPairs=Math.floor(tens.length/2);const totalSuccesses=regularSuccesses+tens.length+critPairs*2;const hasHungerTen=tens.some(d=>d.isHunger);const hasHungerOne=dice.some(d=>d.isHunger&&d.value===1);let outcome;if(totalSuccesses>=difficulty){if(critPairs>0&&hasHungerTen)outcome='messy-critical';else if(critPairs>0)outcome='critical';else outcome='success';}else{if(hasHungerOne)outcome='bestial-failure';else if(totalSuccesses===0)outcome='total-failure';else outcome='failure';}return{dice,totalSuccesses,critPairs,margin:Math.max(0,totalSuccesses-difficulty),outcome,difficulty,poolSize:pool,hungerDice:hunger};}
-function rollRouse(){const v=d10();return{value:v,success:v>=6};}
-const OUTCOMES={'bestial-failure':{label:'Bestial Failure',icon:'☠',desc:'The Beast rears its ugly head. You fail, and something terrible happens.'},'total-failure':{label:'Total Failure',icon:'✕',desc:'Complete failure. No successes at all.'},'failure':{label:'Failure',icon:'—',desc:"You didn't meet the difficulty threshold."},'success':{label:'Success',icon:'✦',desc:'You succeeded at your task.'},'messy-critical':{label:'Messy Critical',icon:'🩸',desc:'A stunning success — but the Beast leaves its mark.'},'critical':{label:'Critical',icon:'♛',desc:'An extraordinary success! Critical pairs grant bonus successes.'}};
-function dieClass(die){const{value,isHunger}=die;const base=isHunger?'die-hunger':'die-regular';if(value===10)return base+' val-10';if(value>=6)return base+' success';if(value===1&&isHunger)return base+' val-1 die-skull';if(value===1)return base+' val-1';return base+' fail';}
-function renderDie(die,idx){const cls=dieClass(die);const style='animation-delay:'+idx*40+'ms';const label=die.value===10?'10':die.value;return'<div class="die '+cls+'" style="'+style+'">'+label+'</div>';}
-let lastResult=null;const history=[];
-function adjust(id,delta){const el=document.getElementById(id);const limits={pool:[1,30],hunger:[0,5],difficulty:[1,15]};const[min,max]=limits[id];el.value=Math.max(min,Math.min(max,parseInt(el.value||0)+delta));}
-function clamp(el,min,max){const v=parseInt(el.value);if(!isNaN(v))el.value=Math.max(min,Math.min(max,v));}
-function doRoll(){if(navigator.vibrate)navigator.vibrate([10,30,20]);const pool=parseInt(document.getElementById('pool').value)||5;const hunger=parseInt(document.getElementById('hunger').value)||0;const difficulty=parseInt(document.getElementById('difficulty').value)||3;const btn=document.getElementById('roll-btn');btn.disabled=true;btn.textContent='Rolling…';setTimeout(()=>{const result=rollV5(pool,hunger,difficulty);lastResult=result;history.unshift(result);if(history.length>20)history.pop();renderResult(result);renderHistory();btn.disabled=false;btn.innerHTML='⚄ Roll Dice';document.getElementById('reroll-btn').style.display='';},120);}
-function doRouse(){if(navigator.vibrate)navigator.vibrate([10,30,20]);const r=rollRouse();renderRouse(r);}
-function renderResult(r){const meta=OUTCOMES[r.outcome];const oc=r.outcome;const sorted=[...r.dice].sort((a,b)=>{const rank=d=>d.value===10?3:d.value>=6?2:1;const hr=d=>d.isHunger?1:0;return rank(b)-rank(a)||hr(a)-hr(b);});const diceHTML=sorted.map((d,i)=>renderDie(d,i)).join('');const regularCount=r.poolSize-r.hungerDice;const diceDesc=[regularCount>0?regularCount+' regular':'',r.hungerDice>0?'<span style="color:var(--hunger)">'+r.hungerDice+' hunger</span>':''].filter(Boolean).join(' + ');let badges='<span class="badge badge-neutral">'+r.totalSuccesses+' success'+(r.totalSuccesses!==1?'es':'')+'</span>';if(r.critPairs>0)badges+='<span class="badge badge-gold">'+r.critPairs+' critical pair'+(r.critPairs>1?'s':'')+'</span>';if(r.margin>0)badges+='<span class="badge badge-green">+'+r.margin+' margin</span>';const html='<div class="result-header oc-'+oc+'"><div class="outcome-icon">'+meta.icon+'</div><div class="outcome-text"><div class="outcome-name">'+meta.label+'</div><div class="outcome-desc">'+meta.desc+'</div></div><div class="outcome-count oc-'+oc+'"><div class="count-big">'+r.totalSuccesses+'</div><div class="count-vs">vs '+r.difficulty+'</div></div></div><div class="divider"></div><div class="dice-section"><div class="dice-label">'+diceDesc+'</div><div class="dice-tray">'+diceHTML+'</div></div><div class="badges">'+badges+'</div>';const card=document.getElementById('result-card');card.style.display='';card.className='card animate-in';document.getElementById('result-content').innerHTML=html;void card.offsetWidth;}
-function renderRouse(r){const win=r.success;const card=document.getElementById('rouse-card');card.style.display='';card.className='card animate-in '+(win?'rouse-win-card':'rouse-lose-card');document.getElementById('rouse-content').innerHTML='<div class="rouse-info"><span style="font-size:1.2rem">'+(win?'✦':'🩸')+'</span><div><div class="rouse-title">Rouse Check</div><div class="rouse-sub">'+(win?'Success — No Hunger increase':'Failure — Hunger rises by 1')+'</div></div></div><div class="rouse-die '+(win?'rouse-win':'rouse-lose')+'">'+r.value+'</div>';}
-function renderHistory(){if(history.length<2)return;const card=document.getElementById('history-card');card.style.display='';const colorMap={'bestial-failure':'var(--blood-light)','total-failure':'#c0392b','failure':'var(--text-dim)','success':'#2ecc71','messy-critical':'#e67e22','critical':'var(--gold)'};const rows=history.slice(1,8).map(r=>{const meta=OUTCOMES[r.outcome];const color=colorMap[r.outcome];return'<div class="history-row"><span class="history-outcome" style="color:'+color+'">'+meta.icon+' '+meta.label+'</span><span class="history-meta">'+r.totalSuccesses+' vs '+r.difficulty+' · '+r.poolSize+'d ('+r.hungerDice+'h)</span></div>';}).join('');document.getElementById('history-list').innerHTML=rows;}
-return {
-    adjust: (typeof adjust!=="undefined"?adjust:null),
-    clamp: (typeof clamp!=="undefined"?clamp:null),
-    doRoll: (typeof doRoll!=="undefined"?doRoll:null),
-    doRouse: (typeof doRouse!=="undefined"?doRouse:null)
-};
-})();
-
-var VTM_Names=(function(){
-// ── Name Data ────────────────────────────────────────────────
-const names = {
-  m: ['Liam','Noah','Oliver','William','James','Benjamin','Lucas','Henry','Alexander','Mason',
-      'Ethan','Daniel','Jacob','Logan','Jackson','Sebastian','Jack','Aiden','Owen','Samuel',
-      'Matthew','Joseph','Levi','Mateo','David','John','Wyatt','Carter','Julian','Luke',
-      'Grayson','Isaac','Jayden','Theodore','Gabriel','Anthony','Dylan','Lincoln','Eli','Jaxon',
-      'Connor','Elijah','Ryan','Nathan','Aaron','Charles','Caleb','Thomas','Nolan','Hudson'],
-  f: ['Olivia','Emma','Charlotte','Amelia','Sophia','Isabella','Ava','Mia','Evelyn','Luna',
-      'Aria','Chloe','Penelope','Layla','Riley','Zoey','Nora','Lily','Eleanor','Hannah',
-      'Lillian','Addison','Aubrey','Ellie','Stella','Natalie','Zoe','Leah','Hazel','Violet',
-      'Aurora','Savannah','Audrey','Brooklyn','Bella','Claire','Skylar','Lucy','Paisley','Everly',
-      'Anna','Caroline','Nova','Genesis','Emilia','Kennedy','Samantha','Maya','Willow','Kinsley'],
-  nb: ['Avery','Riley','Jordan','Rowan','Sage','Quinn','Morgan','Finley','Emery','River',
-       'Skyler','Reese','Charlie','Elliot','Dakota','Cameron','Hayden','Blake','Parker','Sawyer',
-       'Taylor','Casey','Alex','Jamie','Drew','Peyton','Kendall','Shiloh','Eden','Phoenix',
-       'Remy','Sasha','Harlow','Lennox','Indigo','Arlo','Wren','Marlowe','Rory','Jesse',
-       'Scout','Sloane','Teagan','Briar','Onyx','Ellis','Lane','August','Juniper','Kit']
-};
-
-const lastNames = [
-  'Smith','Brown','Tremblay','Martin','Roy','Wilson','Macdonald','Taylor','Thompson','Gagnon',
-  'Johnson','Anderson','Lavoie','Lee','Côté','Leblanc','Thomas','Bouchard','Murphy','Jones',
-  'Campbell','Gauthier','Robinson','Williams','Okafor','Kim','Nguyen','Patel','Singh','Chen',
-  'Walker','Lewis','Scott','Harris','White','Clark','Young','Hall','Baker','Allen',
-  'Hernandez','Moore','Jackson','Mitchell','Carter','Rivera','Rodriguez','Ahmed','Khan','Kapoor'
-];
-
-const genderLabels = { m: 'Male', f: 'Female', nb: 'Non-binary' };
-
-// ── State ────────────────────────────────────────────────────
-let gender = 'm';
-let curFirst = '';
-let curLast = '';
-const history = [];
-
-// ── Haptic ───────────────────────────────────────────────────
-function haptic(type) {
-  if (!navigator.vibrate) return;
-  if (type === 'generate') navigator.vibrate([10, 30, 20]);
-  else if (type === 'swap')  navigator.vibrate(15);
-  else if (type === 'tab')   navigator.vibrate(8);
-}
-
-// ── Helpers ───────────────────────────────────────────────────
-function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-function setGender(g, btn) {
-  haptic('tab');
-  gender = g;
-  document.querySelectorAll('.seg button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-// ── Generate ──────────────────────────────────────────────────
-function generate() {
-  haptic('generate');
-  curFirst = rand(names[gender]);
-  curLast  = rand(lastNames);
-  showName();
-  addHistory();
-}
-
-function newFirst() {
-  if (!curLast) { generate(); return; }
-  haptic('swap');
-  curFirst = rand(names[gender]);
-  showName();
-  updateLastHistory();
-}
-
-function newLast() {
-  if (!curFirst) { generate(); return; }
-  haptic('swap');
-  curLast = rand(lastNames);
-  showName();
-  updateLastHistory();
-}
-
-// ── Display ───────────────────────────────────────────────────
-function showName() {
-  const display = document.getElementById('name-display');
-  display.innerHTML = `
-    <div class="name-first name-flash">${curFirst}</div>
-    <div class="name-last name-flash" style="animation-delay:0.05s">${curLast}</div>
-    <div class="name-gender-tag name-flash" style="animation-delay:0.1s">${genderLabels[gender]}</div>
-  `;
-}
-
-// ── History ───────────────────────────────────────────────────
-function addHistory() {
-  history.unshift({ first: curFirst, last: curLast, gender: genderLabels[gender] });
-  if (history.length > 20) history.pop();
-  renderHistory();
-}
-
-function updateLastHistory() {
-  if (history.length > 0) {
-    history[0] = { first: curFirst, last: curLast, gender: genderLabels[gender] };
-    renderHistory();
-  }
-}
-
-function renderHistory() {
-  if (history.length < 2) return;
-  const card = document.getElementById('history-card');
-  card.style.display = '';
-
-  const rows = history.slice(1, 10).map(h => `
-    <div class="history-row">
-      <span class="history-name">${h.first} ${h.last}</span>
-      <span class="history-gender">${h.gender}</span>
-    </div>
-  `).join('');
-
-  document.getElementById('history-list').innerHTML = rows;
-}
-return {
-    setGender: (typeof setGender!=="undefined"?setGender:null),
-    generate: (typeof generate!=="undefined"?generate:null),
-    newFirst: (typeof newFirst!=="undefined"?newFirst:null),
-    newLast: (typeof newLast!=="undefined"?newLast:null)
-};
-})();
-
-var VTM_Words=(function(){
-// ── Word Lists ────────────────────────────────────────────────
-const wordLists = {
-  grammatical: {
-    nouns: ['house','water','tree','book','door','window','table','chair','car','phone','computer','friend','family','school','work','money','time','day','night','food','hand','eye','heart','mind','body','road','city','country','world','life','love','peace','war','voice','music','light','color','number','letter','word','story','game','place','person','child','parent','teacher','student','doctor','nurse'],
-    verbs: ['run','walk','jump','sit','stand','eat','drink','sleep','wake','speak','listen','read','write','think','feel','love','hate','want','need','have','give','take','make','break','build','create','destroy','help','hurt','heal','teach','learn','work','play','sing','dance','laugh','cry','smile','frown','open','close','start','stop','come','go','stay','leave','arrive','depart'],
-    adjectives: ['big','small','tall','short','long','wide','narrow','thick','thin','heavy','light','fast','slow','hot','cold','warm','cool','dry','wet','clean','dirty','new','old','young','fresh','stale','sweet','bitter','sour','salty','spicy','mild','strong','weak','hard','soft','smooth','rough','sharp','dull','bright','dark','loud','quiet','happy','sad','angry','calm','excited','bored'],
-    adverbs: ['quickly','slowly','carefully','loudly','quietly','softly','hardly','easily','suddenly','gradually','immediately','recently','finally','usually','always','never','sometimes','often','rarely','frequently','clearly','obviously','definitely','probably','possibly','certainly','absolutely','completely','partially','entirely','mainly','mostly','especially','particularly','generally','specifically','exactly','approximately','directly','indirectly','forward','backward','upward','downward','inward','outward','together','apart','nearby','far']
-  },
-  academic: {
-    geography: ['mountain','river','ocean','desert','forest','valley','plateau','peninsula','island','continent','climate','weather','temperature','precipitation','erosion','glacier','volcano','earthquake','latitude','longitude','equator','hemisphere','tropics','arctic','coastline','delta','canyon','prairie','tundra','savanna','reef','strait','bay','cape','ridge','summit','basin','watershed','terrain','landscape','elevation','altitude','migration','population','urban','rural','metropolitan','suburban','boundary','territory'],
-    science: ['atom','molecule','element','compound','reaction','energy','force','motion','gravity','mass','weight','density','volume','pressure','temperature','heat','light','sound','wave','frequency','amplitude','spectrum','radiation','particle','electron','proton','neutron','nucleus','cell','tissue','organ','system','organism','species','evolution','genetics','chromosome','gene','protein','enzyme','bacteria','virus','fungi','plant','animal','ecosystem','habitat','biodiversity','photosynthesis','respiration'],
-    philosophy: ['truth','reality','existence','being','knowledge','wisdom','belief','doubt','certainty','reason','logic','argument','premise','conclusion','fallacy','ethics','morality','virtue','justice','rights','duty','freedom','determinism','consciousness','mind','soul','spirit','identity','self','other','society','culture','tradition','progress','change','permanence','causation','purpose','meaning','value','beauty','art','aesthetic','experience','perception','intuition','emotion','reason','faith','religion'],
-    literature: ['novel','poem','story','drama','character','plot','theme','setting','narrator','dialogue','monologue','metaphor','simile','symbol','irony','imagery','rhythm','rhyme','meter','stanza','verse','prose','fiction','nonfiction','genre','style','tone','mood','voice','perspective','conflict','resolution','climax','exposition','development','conclusion','tragedy','comedy','satire','allegory','epic','ballad','sonnet','haiku','essay','biography','memoir','journal','critique','analysis'],
-    art: ['painting','sculpture','drawing','sketch','canvas','brush','palette','color','hue','shade','tint','tone','contrast','balance','harmony','proportion','perspective','composition','form','shape','line','texture','pattern','design','style','movement','impression','expression','abstract','realistic','portrait','landscape','still-life','mural','fresco','watercolor','oil','acrylic','charcoal','pastel','ceramic','bronze','marble','clay','gallery','museum','exhibition','artist','masterpiece','technique'],
-    mathematics: ['number','digit','integer','fraction','decimal','percent','ratio','proportion','equation','formula','variable','constant','function','graph','coordinate','axis','origin','slope','intercept','angle','degree','triangle','square','rectangle','circle','diameter','radius','circumference','area','perimeter','volume','surface','parallel','perpendicular','symmetry','congruent','similar','theorem','proof','logic','set','sequence','series','sum','product','quotient','remainder','prime','composite','factor'],
-    drama: ['theater','stage','actor','actress','character','role','performance','dialogue','monologue','soliloquy','scene','act','play','script','director','producer','audience','costume','makeup','lighting','sound','music','backdrop','scenery','props','rehearsal','audition','casting','improvisation','gesture','expression','voice','projection','timing','rhythm','tension','conflict','resolution','comedy','tragedy','drama','farce','satire','musical','opera','ballet','dance','movement','choreography'],
-    general: ['good','bad','right','wrong','true','false','yes','no','here','there','now','then','today','tomorrow','yesterday','early','late','before','after','first','last','next','more','less','most','least','all','some','none','every','each','other','same','different','similar','equal','between','among','through','around','above','below','inside','outside','front','back','left','right','up','down']
-  },
-  genre: {
-    horror: ['shadow','scream','blood','darkness','terror','nightmare','ghost','haunted','curse','monster','demon','creature','fear','dread','sinister','macabre','grotesque','eerie','spine','shiver','whisper','fog','cemetery','tomb','crypt','coffin','decay','corpse','skeleton','zombie','vampire','werewolf','witch','ritual','possession','madness','insanity','asylum','torture','agony','victim','prey','lurking','creeping','crawling','howl','shriek','gasp','breath','silence'],
-    romance: ['heart','passion','desire','kiss','embrace','caress','tender','gentle','sweet','devotion','affection','adoration','yearning','longing','beloved','darling','lover','soulmate','destiny','forever','eternal','promise','vow','commitment','trust','intimacy','closeness','warmth','glow','radiant','beautiful','enchanting','captivating','alluring','seductive','magnetic','chemistry','spark','flame','burning','melting','surrender','breathless','flutter','blush','smile','laughter','joy','happiness','bliss'],
-    mystery: ['clue','detective','investigation','suspect','alibi','motive','evidence','witness','testimony','puzzle','riddle','enigma','secret','hidden','concealed','reveal','discovery','uncover','expose','cryptic','obscure','ambiguous','suspicious','questionable','dubious','shadowy','clandestine','covert','conspiracy','plot','scheme','intrigue','deception','betrayal','twist','revelation','breakthrough','trace','trail','footprint','fingerprint','disappearance','vanish','missing','search','pursue','chase','hunt','solve','deduction'],
-    action: ['explosion','combat','battle','fight','strike','attack','defend','pursue','chase','escape','flee','dodge','weapon','sword','blade','gun','bullet','ammunition','grenade','bomb','impact','collision','crash','smash','shatter','destroy','demolish','rush','charge','advance','retreat','ambush','assault','counterattack','revenge','vengeance','danger','threat','risk','peril','adrenaline','intensity','fierce','brutal','savage','relentless','unstoppable','power','strength','victory']
-  },
-  resonance: {
-    sanguine: ['cheerful','optimistic','enthusiastic','lively','playful','spontaneous','sociable','friendly','talkative','expressive','energetic','adventurous','carefree','lighthearted','humorous','witty','charismatic','charming','creative','imaginative','flexible','adaptable','curious','open','trusting','hopeful','bright','sunny','breezy','airy','flowing','dancing','laughing','singing','joyful','delightful','buoyant','spirited','vivacious','radiant','sparkling','effervescent','animated','bouncy','chirpy','peppy','perky','zippy','frisky','merry'],
-    phlegmatic: ['calm','peaceful','serene','tranquil','composed','relaxed','patient','tolerant','accepting','easygoing','gentle','mild','soft','quiet','reserved','modest','humble','unassuming','thoughtful','reflective','contemplative','meditative','steady','stable','consistent','reliable','dependable','loyal','devoted','flowing','fluid','smooth','cool','soothing','comforting','nurturing','healing','restorative','refreshing','cleansing','pure','clear','deep','still','placid','languid','mellow','dreamy','drowsy','restful'],
-    choleric: ['passionate','intense','fierce','bold','daring','courageous','brave','confident','assertive','ambitious','driven','determined','focused','decisive','direct','frank','outspoken','commanding','authoritative','powerful','strong','forceful','dynamic','energetic','vigorous','active','restless','impatient','quick','rapid','hot','burning','blazing','fiery','flaming','scorching','searing','explosive','volatile','tempestuous','stormy','turbulent','aggressive','competitive','winning','dominant','leading','pioneering','trailblazing','revolutionary'],
-    melancholy: ['thoughtful','introspective','pensive','reflective','deep','profound','serious','solemn','grave','earnest','sincere','genuine','authentic','sensitive','emotional','feeling','empathetic','compassionate','caring','nurturing','protective','loyal','faithful','devoted','dedicated','meticulous','detailed','precise','careful','methodical','organized','structured','grounded','solid','stable','enduring','lasting','permanent','rooted','anchored','steadfast','unwavering','resolute','firm','reliable','practical','realistic','sensible','wise','mature']
-  }
-};
-
-const categoryLabels = {
-  resonance: {
-    sanguine: 'Sanguine (air)',
-    phlegmatic: 'Phlegmatic (water)',
-    choleric: 'Choleric (fire)',
-    melancholy: 'Melancholy (earth)'
-  }
-};
-
-const defaultChecked = {
-  grammatical: ['nouns','verbs','adjectives'],
-  academic: ['general'],
-  genre: [],
-  resonance: []
-};
-
-// ── Haptic ────────────────────────────────────────────────────
-function haptic(type) {
-  if (!navigator.vibrate) return;
-  if (type === 'generate') navigator.vibrate([10, 30, 20]);
-  else if (type === 'toggle')  navigator.vibrate(8);
-  else if (type === 'check')   navigator.vibrate(6);
-  else if (type === 'copy')    navigator.vibrate([15, 20, 15]);
-}
-
-// ── Build checkboxes ─────────────────────────────────────────
-function buildSection(sectionName) {
-  const container = document.getElementById('group-' + sectionName);
-  Object.keys(wordLists[sectionName]).forEach(cat => {
-    const label = document.createElement('label');
-    label.className = 'checkbox-label';
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.id = sectionName + '-' + cat;
-    cb.dataset.section = sectionName;
-    cb.value = cat;
-    cb.checked = defaultChecked[sectionName].includes(cat);
-    cb.addEventListener('change', () => haptic('check'));
-    const span = document.createElement('span');
-    span.textContent = categoryLabels[sectionName]?.[cat] || cat;
-    label.appendChild(cb);
-    label.appendChild(span);
-    container.appendChild(label);
-  });
-}
-
-['grammatical','academic','genre','resonance'].forEach(buildSection);
-
-// ── Toggle sections ───────────────────────────────────────────
-function toggleSection(name) {
-  haptic('toggle');
-  const group = document.getElementById('group-' + name);
-  const arrow = document.getElementById('arrow-' + name);
-  group.classList.toggle('collapsed');
-  arrow.classList.toggle('open');
-}
-
-// ── Select helpers ────────────────────────────────────────────
-function sectionSelect(name, val) {
-  haptic('toggle');
-  document.querySelectorAll(`input[data-section="${name}"]`).forEach(cb => cb.checked = val);
-}
-function masterSelect(val) {
-  haptic('toggle');
-  document.querySelectorAll('input[type="checkbox"][data-section]').forEach(cb => cb.checked = val);
-}
-
-// ── Stepper ───────────────────────────────────────────────────
-function adjust(delta) {
-  haptic('check');
-  const el = document.getElementById('wordCount');
-  el.value = Math.max(1, Math.min(10, parseInt(el.value || 5) + delta));
-}
-
-// ── Generate ──────────────────────────────────────────────────
-let lastWords = [];
-
-function generate() {
-  haptic('generate');
-  const count = parseInt(document.getElementById('wordCount').value) || 5;
-  const checked = document.querySelectorAll('input[type="checkbox"]:checked');
-  if (checked.length === 0) {
-    document.getElementById('results-card').style.display = '';
-    document.getElementById('word-output').innerHTML = '<div class="empty-state">Please select at least one category.</div>';
-    document.getElementById('copy-text-block').style.display = 'none';
-    return;
-  }
-
-  const pool = [];
-  checked.forEach(cb => pool.push(...wordLists[cb.dataset.section][cb.value]));
-  const unique = [...new Set(pool)].sort(() => Math.random() - 0.5);
-  lastWords = unique.slice(0, Math.min(count, unique.length));
-
-  const card = document.getElementById('results-card');
-  card.style.display = '';
-
-  const tags = lastWords.map((w, i) =>
-    `<span class="word-tag" style="animation-delay:${i * 35}ms">${w}</span>`
-  ).join('');
-  document.getElementById('word-output').innerHTML = `<div class="word-tags">${tags}</div>`;
-
-  document.getElementById('copy-text').textContent = lastWords.join(', ');
-  document.getElementById('copy-text-block').style.display = '';
-
-  const copyBtn = document.getElementById('copy-btn');
-  copyBtn.textContent = '📋 Copy to Clipboard';
-  copyBtn.classList.remove('copied');
-
-  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-// ── Copy ──────────────────────────────────────────────────────
-function copyWords() {
-  haptic('copy');
-  navigator.clipboard.writeText(lastWords.join(', ')).then(() => {
-    const btn = document.getElementById('copy-btn');
-    btn.textContent = '✓ Copied to Clipboard';
-    btn.classList.add('copied');
-    setTimeout(() => {
-      btn.textContent = '📋 Copy to Clipboard';
-      btn.classList.remove('copied');
-    }, 2000);
-  });
-}
-return {
-    adjust: (typeof adjust!=="undefined"?adjust:null),
-    toggleSection: (typeof toggleSection!=="undefined"?toggleSection:null),
-    sectionSelect: (typeof sectionSelect!=="undefined"?sectionSelect:null),
-    masterSelect: (typeof masterSelect!=="undefined"?masterSelect:null),
-    generate: (typeof generate!=="undefined"?generate:null),
-    copyWords: (typeof copyWords!=="undefined"?copyWords:null)
-};
-})();
-
-var VTM_Oracle=(function(){
-
-  let tier = 1;
-  let mood = null;
-  let complications = [];
-
-  function setTier(t, el) {
-    tier = t;
-    document.querySelectorAll('#app-oracle .dice-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-  }
-
-  function setMood(m, el) {
-    if (mood === m) {
-      mood = null;
-      el.classList.remove('active');
-    } else {
-      mood = m;
-      document.querySelectorAll('#app-oracle .mood-btn').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
-    }
-  }
-
-  const answers = [
-    { label: 'No, and\u2014', cls: 'no-and', details: [
-      "Not only does the scene deny you what you sought, it closes a door. Something\u2014or someone\u2014has made it harder to return.",
-      "The site turns actively hostile. A presence here has taken notice of your interest and does not welcome it.",
-      "The question has no answer here. The trail is cold. And someone is watching you leave."
-    ]},
-    { label: 'No, and\u2014', cls: 'no-and', details: [
-      "The city conspires against you tonight. Leave before the situation worsens.",
-      "An ally at this site has become unreliable. Someone got to them first.",
-      "Whatever you came for has been removed, destroyed, or silenced."
-    ]},
-    { label: 'No, and\u2014', cls: 'no-and', details: [
-      "The scene sours completely. You leave with less than you came with.",
-      "A door closes. Note who closed it\u2014they will be a problem.",
-      "Hostile eyes follow you out. This site is compromised for now."
-    ]},
-    { label: 'No.', cls: 'no', details: [
-      "The answer you sought isn't here. The site offers nothing on this tonight.",
-      "Closed doors. Averted eyes. Whatever you came looking for, you find only absence.",
-      "The site is unreadable tonight. Pursue this question at another time."
-    ]},
-    { label: 'No.', cls: 'no', details: [
-      "Nothing useful surfaces. The people here don't know, or won't say.",
-      "A dead end. The answer lies elsewhere\u2014or deeper.",
-      "The site keeps its counsel. You leave with nothing confirmed."
-    ]},
-    { label: 'No.', cls: 'no', details: [
-      "Silence. The question hangs unanswered. Try a different approach.",
-      "No one here can help you, or no one will. The distinction barely matters.",
-      "The trail ends here. Another site may hold what you need."
-    ]},
-    { label: 'No, but\u2014', cls: 'no-but', details: [
-      "You don't get an answer, but you pick up a thread. Follow it somewhere else.",
-      "The scene denies you, but leaves a crack. A name, a gesture, a door slightly ajar.",
-      "Not tonight. But someone here knows something, and they've noticed you're asking."
-    ]},
-    { label: 'No, but\u2014', cls: 'no-but', details: [
-      "The answer eludes you, but the question itself has stirred something. Check back.",
-      "Failure yields a consolation: a Resident reveals a tangential truth worth noting.",
-      "You don't find what you came for, but you find something you weren't expecting."
-    ]},
-    { label: 'No, but\u2014', cls: 'no-but', details: [
-      "Not here, not tonight\u2014but a lead surfaces. It points somewhere useful.",
-      "The question goes unanswered, but a contact is made. That may matter more.",
-      "Empty-handed, but not empty-headed. Note what you learned about the site itself."
-    ]},
-    { label: 'Yes, but\u2014', cls: 'yes-but', details: [
-      "The answer comes, but at a cost. A complication surfaces alongside the information.",
-      "You get what you need, though not cleanly. Someone else is also now aware of your interest.",
-      "The question is answered\u2014imperfectly. The truth is partial, or the price is unclear."
-    ]},
-    { label: 'Yes, but\u2014', cls: 'yes-but', details: [
-      "Progress, but with friction. The answer is here; so is a problem you didn't anticipate.",
-      "A Resident gives you what you need and asks for something in return\u2014or will, later.",
-      "Yes, with a shadow attached. Note the complication before moving on."
-    ]},
-    { label: 'Yes, but\u2014', cls: 'yes-but', details: [
-      "The information is yours, but the cost isn't clear yet. It will become clear.",
-      "Answered\u2014with strings. A favour owed, a secret shared, a witness you didn't want.",
-      "You find what you came for, and something finds you in return."
-    ]},
-    { label: 'Yes.', cls: 'yes', details: [
-      "The site yields. The answer to your question is clear and unambiguous.",
-      "Clean information. A Resident confirms what you needed to know.",
-      "The Tour delivers. Note the answer and one detail about who else was present."
-    ]},
-    { label: 'Yes.', cls: 'yes', details: [
-      "The question is answered fully. The vignette can close.",
-      "Unambiguous. The scene has given you what you came for.",
-      "The site is open to you tonight. Take your answer and go."
-    ]},
-    { label: 'Yes.', cls: 'yes', details: [
-      "A straightforward success. The city has nothing to hide from you tonight.",
-      "The answer surfaces easily. Note it and move on.",
-      "What you sought was here all along. Uncomplicated. Enjoy the rarity."
-    ]},
-    { label: 'Yes, and\u2014', cls: 'yes-and', details: [
-      "Better than expected. The answer arrives with a bonus\u2014an extra detail, a useful contact, an unexpected advantage.",
-      "The scene exceeds the question. Note one additional thing you learned that you weren't looking for.",
-      "A gift from the city. Your question is answered, and something unexpected falls into your lap."
-    ]},
-    { label: 'Yes, and\u2014', cls: 'yes-and', details: [
-      "Exceptional. The answer and something more\u2014a new alliance, a revealed secret, a dramatic turn.",
-      "The site gives you everything tonight. Mark a new NPC as friendly or a Resident as an asset.",
-      "More than you hoped for. The answer is clear, and the scene has opened a new possibility."
-    ]},
-    { label: 'Yes, and\u2014', cls: 'yes-and', details: [
-      "The city opens up. Not only is your question answered, a door you didn't know existed swings wide.",
-      "Windfall. Take the answer and an unexpected advantage\u2014use it before it expires.",
-      "Fortune favours you entirely tonight. Note the answer and one new asset at this site."
-    ]},
-    { label: 'Yes, and\u2014', cls: 'yes-and', details: [
-      "Everything you came for, and more. The night has decided to be generous. Don't question it.",
-      "The scene delivers beyond all expectation. Mark this site as particularly fruitful.",
-      "A rare and complete success. The answer, an advantage, and a moment to savour."
-    ]}
-  ];
-
-  const complicationsBySituation = {
-    tense: [
-      "A confrontation nearby is about to spill over \u2014 NPC pushes another, voices rising.",
-      "Someone is watching the exits. They leave the moment your character looks at them.",
-      "A weapon or dangerous object is visible where it shouldn't be."
-    ],
-    celebratory: [
-      "The crowd is too loud; something important is being drowned out.",
-      "An NPC is very drunk and says something they shouldn't.",
-      "The festivities are cover for something being moved or exchanged."
-    ],
-    deserted: [
-      "The emptiness has a reason. Signs of a hasty departure.",
-      "A single light on in a room that should be empty.",
-      "Something has been left behind that wasn't meant to be found."
-    ],
-    chaotic: [
-      "Your character is separated from the point of interest by the crowd or commotion.",
-      "Emergency services are on their way. Time is short.",
-      "An NPC mistakes your character for someone else \u2014 dangerously so."
-    ],
-    mournful: [
-      "Someone is grieving openly and blocks access to the area you need.",
-      "The site is connected to a recent death. Residents are reluctant to speak.",
-      "A memorial or shrine has appeared overnight. Nobody knows who placed it."
-    ],
-    conspiratorial: [
-      "A meeting is occurring that wasn't meant to be observed.",
-      "Someone passes a note or object with careful casualness.",
-      "An NPC goes suddenly silent and gives your character a look."
-    ],
-    predatory: [
-      "Another Kindred is here. They haven't noticed you yet.",
-      "A mortal is being slowly isolated from the group by someone.",
-      "The hunting ground is marked. Someone has been here recently."
-    ],
-    oblivious: [
-      "The mortals here are completely unaware of the supernatural element in plain sight.",
-      "Your character's careful approach was unnecessary \u2014 nobody is paying attention.",
-      "An opportunity exists to act openly. But doing so may attract attention later."
-    ]
-  };
-
-  function rollOracle() {
-    if (navigator.vibrate) navigator.vibrate([10, 30, 20]);
-    const d1 = Math.ceil(Math.random() * 10);
-    const d2 = Math.ceil(Math.random() * 10);
-    let roll = d1 + d2;
-    roll = Math.max(2, Math.min(20, roll - (tier - 1)));
-
-    const answerIdx = roll - 2;
-    const answer = answers[answerIdx];
-    const detail = answer.details[Math.floor(Math.random() * answer.details.length)];
-
-    let complicationText = null;
-    const forceComplication = (roll <= 7) || (roll <= 10 && tier === 3);
-
-    if (forceComplication && mood && complicationsBySituation[mood]) {
-      const pool = complicationsBySituation[mood];
-      complicationText = pool[Math.floor(Math.random() * pool.length)];
-    } else if (forceComplication) {
-      const generic = [
-        "A Resident has witnessed more than intended. They will remember.",
-        "Something at the site has changed since you last heard about it \u2014 for the worse.",
-        "An unexpected figure appears: someone who shouldn't be here.",
-        "Equipment, access, or an NPC that was available is now unavailable.",
-        "The scene ends abruptly. Something has spooked the site."
-      ];
-      complicationText = generic[Math.floor(Math.random() * generic.length)];
-    }
-
-    const outputEl = document.getElementById('oracle-output');
-    let html = '<div class="animate-in">';
-    html += '<div class="result-dice">d10+d10 \u2192 ' + d1 + '+' + d2 + ' | tier ' + (tier > 1 ? '-'+(tier-1)+' \u2192 ' : '') + 'roll ' + roll + '</div>';
-    html += '<div class="result-answer ' + answer.cls + '">' + answer.label + '</div>';
-    html += '<div class="result-detail">' + detail + '</div>';
-
-    if (complicationText) {
-      html += '<div class="result-complication">' + complicationText + '</div>';
-      complications.push({ text: complicationText, resolved: false });
-      renderPool();
-    }
-
-    html += '</div>';
-    outputEl.innerHTML = html;
-  }
-
-  function addComplication() {
-    if (navigator.vibrate) navigator.vibrate(8);
-    const input = document.getElementById('oracle-pool-input');
-    const val = input.value.trim();
-    if (!val) return;
-    complications.push({ text: val, resolved: false });
-    input.value = '';
-    renderPool();
-  }
-
-  document.getElementById('oracle-pool-input').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') addComplication();
-  });
-
-  function renderPool() {
-    const list = document.getElementById('oracle-pool-list');
-    list.innerHTML = '';
-    if (complications.length === 0) {
-      list.innerHTML = '<li style="font-style:italic; color: var(--fog); font-size:0.9rem; padding: 10px 0;">No complications noted yet.</li>';
-      return;
-    }
-    complications.forEach(function(c, i) {
-      const li = document.createElement('li');
-      li.className = 'pool-item' + (c.resolved ? ' resolved' : '');
-      li.innerHTML = '<span class="pool-num">' + String(i+1).padStart(2,'0') + '</span>' + c.text;
-      li.addEventListener('click', function() {
-        if (navigator.vibrate) navigator.vibrate(8);
-        complications[i].resolved = !complications[i].resolved;
-        renderPool();
-      });
-      list.appendChild(li);
-    });
-  }
-
-  renderPool();
-
-return {
-    setTier: (typeof setTier!=="undefined"?setTier:null),
-    setMood: (typeof setMood!=="undefined"?setMood:null),
-    rollOracle: (typeof rollOracle!=="undefined"?rollOracle:null),
-    addComplication: (typeof addComplication!=="undefined"?addComplication:null)
-};
-})();
-</script>
+    <div id="app"></div>
+    <script>
+        const cats = {
+            Music: {r: ['Pop Star', 'Rock Musician', 'Hip-Hop Artist', 'Opera Singer', 'DJ'], l: ['Recording Studio', 'Concert Venue', 'Nightclub VIP', 'Hotel Suite']},
+            FilmTV: {r: ['Actor', 'TV Star', 'Director', 'Producer'], l: ['Film Studio', 'TV Network', 'Premiere Party', 'Hotel Penthouse']},
+            Comedy: {r: ['Comedian', 'Comedy Writer', 'Late Night Host'], l: ['Comedy Club', 'Late Night Studio', 'Theater Backstage']},
+            Politics: {r: ['Senator', 'Mayor', 'Governor', 'Ambassador'], l: ['City Hall', 'Political Club', 'Embassy', 'Fundraiser']},
+            BizTech: {r: ['Tech CEO', 'Founder', 'Investor', 'Real Estate Mogul'], l: ['Boardroom', 'Members Club', 'Golf Club', 'Steakhouse']},
+            Sports: {r: ['Athlete', 'Team Owner', 'Commentator', 'Coach'], l: ['VIP Suite', 'Fitness Center', 'Training Facility', 'Golf Course']},
+            Culture: {r: ['Chef', 'Museum Director', 'Author', 'Professor', 'Scientist'], l: ['Restaurant', 'Art Gallery', 'Literary Salon', 'Faculty Club']},
+            Royalty: {r: ['Prince', 'Princess', 'Duke', 'Duchess', 'Count'], l: ['Palace', 'Royal Estate', 'Royal Gala', 'Historic Manor']},
+            Crime: {r: ['Crime Boss', 'Financier', 'Dealer', 'Money Launderer'], l: ['Casino Backroom', 'Underground Club', 'Warehouse Office', 'Strip Club VIP']},
+            SocialMedia: {r: ['Influencer', 'YouTube Star', 'TikTok Celebrity', 'Streamer'], l: ['Creation Studio', 'Influencer Event', 'Creator House', 'Pop-up Store']}
+        };
+        
+        const catNames = {
+            Music: 'Music',
+            FilmTV: 'Film and TV',
+            Comedy: 'Comedy',
+            Politics: 'Politics',
+            BizTech: 'Business and Tech',
+            Sports: 'Sports',
+            Culture: 'Culture and Academia',
+            Royalty: 'Royalty',
+            Crime: 'Crime',
+            SocialMedia: 'Social Media'
+        };
+        
+        const names = {
+            english: {f: ['James', 'Mary', 'Robert', 'Patricia', 'John', 'Jennifer', 'Michael', 'Linda', 'David', 'Elizabeth'], l: ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis']},
+            italian: {f: ['Giuseppe', 'Maria', 'Antonio', 'Anna', 'Francesco', 'Rosa'], l: ['Rossi', 'Russo', 'Ferrari', 'Esposito', 'Bianchi']},
+            french: {f: ['Jean', 'Marie', 'Michel', 'Pierre', 'Andre'], l: ['Martin', 'Bernard', 'Thomas', 'Petit', 'Robert']},
+            german: {f: ['Hans', 'Anna', 'Klaus', 'Peter'], l: ['Muller', 'Schmidt', 'Schneider', 'Fischer']},
+            spanish: {f: ['Antonio', 'Maria', 'Jose', 'Carmen'], l: ['Garcia', 'Gonzalez', 'Rodriguez', 'Fernandez']},
+            nordic: {f: ['Erik', 'Anna', 'Lars', 'Emma'], l: ['Andersson', 'Johansson', 'Karlsson', 'Nilsson']},
+            slavic: {f: ['Vladimir', 'Svetlana', 'Dmitri', 'Natasha'], l: ['Ivanov', 'Petrov', 'Smirnov', 'Kuznetsov']},
+            eastasian: {f: ['Hiroshi', 'Yuki', 'Wei', 'Li'], l: ['Tanaka', 'Suzuki', 'Wang', 'Zhang']},
+            middleeastern: {f: ['Ahmed', 'Fatima', 'Mohammad', 'Aisha'], l: ['Al-Ahmad', 'Mahmoud', 'Ibrahim', 'Mansour']}
+        };
+        
+        const cityMap = {'london':'english','new york':'english','los angeles':'english','paris':'french','berlin':'german','rome':'italian','madrid':'spanish','stockholm':'nordic','moscow':'slavic','tokyo':'eastasian','dubai':'middleeastern'};
+        
+        const tiers = [{t:'A',d:'Internationally known household name'},{t:'B',d:'Nationally famous'},{t:'C',d:'TV cast, regionally known'},{t:'D',d:'Reality TV stars'},{t:'Z',d:'Influencers, niche personalities'}];
+        const sec = [{l:'Minimal',i:'🟢',d:'Personal assistant only'},{l:'Light',i:'🟡',d:'Small security'},{l:'Moderate',i:'🟠',d:'Bodyguards'},{l:'Heavy',i:'🔴',d:'Multiple layers'}];
+        
+        let state = {city:'',target:null,sel:{}};
+        Object.keys(cats).forEach(function(k){
+            state.sel[k] = true;
+        });
+        state.sel.Associates = true;
+        
+        function r(a){return a[Math.floor(Math.random()*a.length)];}
+        function gn(c){const reg=cityMap[c.toLowerCase().trim()]||'english';const n=names[reg];return r(n.f)+' '+r(n.l);}
+        
+        function getWeightedTier(){
+            const pool=[];
+            for(let i=0;i<1;i++)pool.push('A');
+            for(let i=0;i<2;i++)pool.push('B');
+            for(let i=0;i<5;i++)pool.push('C');
+            for(let i=0;i<6;i++)pool.push('D');
+            for(let i=0;i<6;i++)pool.push('Z');
+            const tier=r(pool);
+            return tiers.find(t=>t.t===tier);
+        }
+        
+        function getDifficultyForTier(tier){
+            const ranges={'A':[3,4,5],'B':[2,3,4,5],'C':[1,2,3,4],'D':[1,2,3],'Z':[0,1,2,3]};
+            return r(ranges[tier]);
+        }
+        
+        function ga(p,t){
+            const rel=['Spouse of','Partner of','Parent of','Child of','Sibling of','Manager of'];
+            const roles=['Socialite','Investor','Philanthropist','Designer','Restaurant Owner'];
+            const tm={'A':'C','B':'D','C':'Z','D':'Z','Z':'Z'};
+            return{rel:r(rel),role:r(roles),pc:p,fame:tiers.find(f=>f.t===tm[t])};
+        }
+        
+        function toggleCat(k){
+            state.sel[k] = !state.sel[k];
+            render();
+        }
+        
+        function updateCity(val){
+            state.city = val;
+        }
+        
+        function checkEnter(e){
+            if(e.key === 'Enter') gen();
+        }
+        
+        function gen(){
+            if(!state.city.trim())return;
+            const cs=Object.keys(cats).filter(k=>state.sel[k]).map(k=>({cat:k,r:cats[k].r,l:cats[k].l}));
+            if(state.sel.Associates)cs.push({cat:'Associates'});
+            if(!cs.length){alert('Select at least one category');return;}
+            const c=r(cs);
+            let t;
+            const f=getWeightedTier();
+            const diff=getDifficultyForTier(f.t);
+            if(c.cat==='Associates'){
+                const nc=Object.keys(cats).map(k=>({cat:k,r:cats[k].r}));
+                const pc=r(nc);
+                const pr=r(pc.r);
+                const pn=gn(state.city);
+                const ai=ga(pn,f.t);
+                const locs=['Private Residence','Spa','Shopping District','Hotel Lounge','Members Club','Gallery','Charity Event'];
+                t={name:gn(state.city),role:ai.role,cat:'Associates',loc:r(locs)+' - '+state.city,sec:r(sec),fame:ai.fame,isA:true,rel:ai.rel,pc:ai.pc,pr:pr,diff:getDifficultyForTier(ai.fame.t)};
+            }else{
+                t={name:gn(state.city),role:r(c.r),cat:c.cat,loc:r(c.l)+' - '+state.city,sec:r(sec),fame:f,isA:false,diff:diff};
+            }
+            const hooks=['Recently in scandal','Major achievement','Secret business deal','Private charity event','Meeting power brokers','Recovering from controversy','Launching venture','Power struggle'];
+            const comps=['Heavy media nearby','Rival faction interested','Extra security','Many witnesses','Bodyguard is ghoul','Mystical wards','Target suspicious','Police investigation'];
+            t.hook=r(hooks);
+            t.comp=r(comps);
+            state.target=t;
+            render();
+        }
+        
+        function render(){
+            var app=document.getElementById('app');
+            var allOff=Object.values(state.sel).every(function(v){return !v;});
+            var html = '';
+            html += '<div class="container"><div class="header"><h1 class="title">Rosas Ventrue Feeding Generator</h1><p class="subtitle">Find worthy prey for your discriminating Ventrue</p></div>';
+            html += '<div class="card"><h3 class="card-title">Target Categories</h3><p class="card-text">Select which types of targets are appropriate for your current scene:</p><div class="checkbox-grid">';
+            Object.keys(cats).forEach(function(k){
+                var chk = state.sel[k] ? 'checked' : '';
+                var cls = state.sel[k] ? 'checkbox-text-active' : 'checkbox-text-inactive';
+                html += '<label class="checkbox-label"><input type="checkbox" class="checkbox" data-cat="'+k+'" '+chk+'><span class="checkbox-text '+cls+'">'+catNames[k]+'</span></label>';
+            });
+            var chkA = state.sel.Associates ? 'checked' : '';
+            var clsA = state.sel.Associates ? 'checkbox-text-active' : 'checkbox-text-inactive';
+            html += '<label class="checkbox-label"><input type="checkbox" class="checkbox" data-cat="Associates" '+chkA+'><span class="checkbox-text '+clsA+'">Associates</span></label>';
+            html += '</div>';
+            if(allOff) html += '<div class="warning">Warning: No target categories selected</div>';
+            html += '</div>';
+            var disabled = '';
+            if(!state.city.trim() || allOff){
+                disabled = 'disabled';
+            }
+            html += '<div class="card"><div class="input-group"><div class="input-wrapper"><label class="label">Enter City Name</label><input type="text" id="cityInput" class="input" value="'+state.city+'" placeholder="e.g., New York, London, Tokyo..."></div>';
+            html += '<button class="button" id="genBtn" '+disabled+'>Find Target</button></div></div>';
+            if(state.target){
+                var t=state.target;
+                html += '<div class="card"><div class="target-grid"><div><div class="target-name">'+t.name+'</div>';
+                if(t.isA) html += '<div class="associate-box"><div class="associate-text"><strong>'+t.rel+'</strong> '+t.pc+'</div><div class="associate-subtext">('+t.pr+')</div></div>';
+                html += '<div class="info-row"><span class="info-label">Role:</span> '+t.role+'</div>';
+                html += '<div class="info-row"><span class="info-label">Location:</span> '+t.loc+'</div>';
+                html += '<div class="info-row"><span class="info-label">Fame Tier:</span> '+t.fame.t+'-List</div>';
+                html += '<div class="fame-box">'+t.fame.d+'</div>';
+                html += '<div class="info-row"><span class="info-label">Security:</span> '+t.sec.i+' '+t.sec.l+' ('+t.sec.d+')</div>';
+                var stars = '<div class="info-row"><span class="info-label">Difficulty:</span> <span class="stars">';
+                for(var i=0;i<t.diff;i++) stars+='★';
+                for(var i=t.diff;i<5;i++) stars+='☆';
+                stars+='</span></div>';
+                html += stars;
+                html += '</div><div><h3 class="story-section-title">Story Elements</h3>';
+                html += '<div class="story-box"><h4 class="story-title">Current Situation</h4><p class="story-text">'+t.hook+'</p></div>';
+                html += '<div class="complication-box"><h4 class="complication-title">Potential Complication</h4><p class="complication-text">'+t.comp+'</p></div>';
+                html += '<div class="opportunity-box"><h4 class="opportunity-title">Feeding Opportunity</h4><p class="opportunity-text">Target likely alone between <strong>'+(Math.floor(Math.random()*4)+21)+':00-'+(Math.floor(Math.random()*4)+1)+':00</strong> when security is lightest.</p></div>';
+                html += '</div></div></div>';
+            }
+            html += '<div class="footer"><p>Remember: The Masquerade must be maintained at all costs.</p></div></div>';
+            app.innerHTML = html;
+            
+            document.querySelectorAll('input[type="checkbox"]').forEach(function(cb){
+                cb.addEventListener('click',function(){
+                    var cat = this.getAttribute('data-cat');
+                    state.sel[cat] = !state.sel[cat];
+                    render();
+                });
+            });
+            
+            var cityInput = document.getElementById('cityInput');
+            if(cityInput){
+                cityInput.addEventListener('input',function(){
+                    state.city = this.value;
+                    var genBtn = document.getElementById('genBtn');
+                    if(genBtn){
+                        var allOff = Object.values(state.sel).every(function(v){return !v;});
+                        if(!state.city.trim() || allOff){
+                            genBtn.setAttribute('disabled', 'disabled');
+                        } else {
+                            genBtn.removeAttribute('disabled');
+                        }
+                    }
+                });
+                cityInput.addEventListener('keypress',function(e){
+                    if(e.key === 'Enter'){
+                        gen();
+                    }
+                });
+            }
+            
+            var genBtn = document.getElementById('genBtn');
+            if(genBtn){
+                genBtn.addEventListener('click', function(){
+                    gen();
+                });
+            }
+        }
+        
+        window.onload = function(){
+            render();
+        };
+    </script>
 </body>
 </html>
