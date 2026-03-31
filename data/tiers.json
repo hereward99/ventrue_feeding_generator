@@ -1,0 +1,46 @@
+{
+  "tiers": [
+    {
+      "tier": "A",
+      "level": "A-List Celebrity",
+      "description": "Internationally known, household name",
+      "weight": 1,
+      "difficultyRange": [3, 4, 5]
+    },
+    {
+      "tier": "B",
+      "level": "B-List Celebrity",
+      "description": "Movie stars, pop stars, nationally famous",
+      "weight": 2,
+      "difficultyRange": [2, 3, 4, 5]
+    },
+    {
+      "tier": "C",
+      "level": "C-List Celebrity",
+      "description": "TV cast, nationally recognized in own country",
+      "weight": 5,
+      "difficultyRange": [1, 2, 3, 4]
+    },
+    {
+      "tier": "D",
+      "level": "D-List Celebrity",
+      "description": "Reality TV stars, minor celebrities",
+      "weight": 6,
+      "difficultyRange": [1, 2, 3]
+    },
+    {
+      "tier": "Z",
+      "level": "Z-List Celebrity",
+      "description": "Influencers, niche channel personalities",
+      "weight": 6,
+      "difficultyRange": [0, 1, 2, 3]
+    }
+  ],
+  "associateTierMap": {
+    "A": "C",
+    "B": "D",
+    "C": "Z",
+    "D": "Z",
+    "Z": "Z"
+  }
+}

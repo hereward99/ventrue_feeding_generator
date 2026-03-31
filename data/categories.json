@@ -1,0 +1,47 @@
+{
+  "Music": {
+    "roles": ["Pop Star", "Rock Musician", "Hip-Hop Artist", "Classical Conductor", "Opera Singer", "Jazz Performer", "DJ/Producer", "Music Executive"],
+    "locations": ["Recording Studio", "Concert Venue Backstage", "Music Label Office", "Exclusive Nightclub VIP Area", "Private Rehearsal Space", "Luxury Hotel Suite", "Award Show After-Party", "Radio Station"]
+  },
+  "Film and TV": {
+    "roles": ["Hollywood Actor", "TV Star", "Director", "Producer", "Showrunner", "Streaming Series Lead", "Character Actor", "Voice Actor"],
+    "locations": ["Film Studio Lot", "TV Network Building", "Premiere After-Party", "Luxury Hotel Penthouse", "Private Screening Room", "Trailer on Set", "Production Office", "Casting Agency"]
+  },
+  "Comedy": {
+    "roles": ["Stand-up Comedian", "Comedy Writer", "Sketch Performer", "Late Night Host", "Comedy Podcast Host", "Improv Actor", "Satirist"],
+    "locations": ["Comedy Club Green Room", "Late Night Studio", "Podcast Recording Studio", "Theater Backstage", "Writers Room", "Comedy Festival Venue", "Exclusive Comedy Bar"]
+  },
+  "Politics": {
+    "roles": ["Senator", "Mayor", "Governor", "Ambassador", "City Council Member", "Political Commentator", "Campaign Manager", "Lobbyist", "Political Strategist"],
+    "locations": ["City Hall Private Office", "Exclusive Political Club", "Embassy Reception", "Private Fundraiser Venue", "Government Building", "Elite Country Club", "Five-Star Hotel Bar", "Political Convention Suite"]
+  },
+  "Business and Tech": {
+    "roles": ["Tech CEO", "Startup Founder", "Venture Capitalist", "Real Estate Mogul", "Investment Banker", "Media Executive", "Fortune 500 CEO", "Cryptocurrency Entrepreneur", "E-commerce Magnate"],
+    "locations": ["Corporate Boardroom", "Private Members Club", "Tech Campus", "Luxury Car Dealership", "Executive Airport Lounge", "High-rise Penthouse Office", "Exclusive Golf Club", "Premium Steakhouse", "Yacht Club"]
+  },
+  "Sports": {
+    "roles": ["Professional Athlete", "Team Owner", "Sports Commentator", "Olympic Medalist", "Retired Champion", "Sports Agent", "Team Coach", "Athletic Director"],
+    "locations": ["VIP Stadium Suite", "Elite Fitness Center", "Sports Bar (upscale)", "Team Training Facility", "Athletes-only Lounge", "Luxury Sports Complex", "Celebrity Golf Course", "Private Boxing Gym"]
+  },
+  "Culture and Academia": {
+    "roles": ["Renowned Chef", "Museum Director", "Art Gallery Owner", "Famous Author", "Classical Musician", "Opera Performer", "Fashion Designer", "Architect", "University Professor", "Research Scientist", "Playwright", "Contemporary Artist", "Ballet Dancer"],
+    "locations": ["Michelin-starred Restaurant", "Private Art Gallery", "Opera House VIP Box", "Literary Salon", "Designer Boutique", "Cultural Center VIP Area", "Exclusive Book Launch", "University Faculty Club", "Museum Private Collection Room", "Theater Opening Night Party"]
+  },
+  "Royalty": {
+    "roles": ["Prince", "Princess", "Duke", "Duchess", "Count", "Countess", "Baron", "Baroness", "Royal Advisor", "Royal Family Member"],
+    "locations": ["Palace Private Wing", "Royal Estate", "Diplomatic Reception", "Exclusive Royal Gala", "Private Royal Box", "Aristocratic Club", "Historic Manor", "Royal Charity Event"]
+  },
+  "Crime": {
+    "roles": ["Crime Boss", "Underworld Financier", "Black Market Dealer", "Organized Crime Lieutenant", "Money Launderer", "Smuggling Kingpin", "Casino Owner", "Corrupt Official"],
+    "locations": ["Private Casino Backroom", "Exclusive Underground Club", "Waterfront Warehouse Office", "Upscale Strip Club VIP", "Money Laundering Front Business", "High-end Restaurant Back Office", "Luxury Penthouse", "Private Poker Game"]
+  },
+  "Social Media": {
+    "roles": ["Mega Influencer", "YouTube Star", "TikTok Celebrity", "Instagram Model", "Twitch Streamer", "Content Creator", "Social Media Mogul", "Online Personality"],
+    "locations": ["Content Creation Studio", "Influencer Event", "Brand Partnership Office", "Trendy Restaurant (for content)", "Social Media Company HQ", "Creator House", "Pop-up Store Launch", "Exclusive Influencer Lounge"]
+  },
+  "Associates": {
+    "relationships": ["Spouse of", "Partner of", "Ex-spouse of", "Parent of", "Child of", "Sibling of", "Business partner of", "Manager of", "Agent of", "Best friend of"],
+    "roles": ["Socialite", "Private Investor", "Philanthropist", "Art Collector", "Fashion Designer", "Restaurant Owner", "Boutique Owner", "Lifestyle Brand Owner", "Former Model", "Trust Fund Heir"],
+    "locations": ["Private Residence", "Exclusive Spa", "High-end Shopping District", "Luxury Hotel Lounge", "Private Members Club", "Gallery Opening", "Charity Luncheon", "Country Club", "Designer Boutique", "Premium Restaurant"]
+  }
+}

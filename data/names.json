@@ -1,0 +1,75 @@
+{
+  "english": {
+    "first": ["James", "Mary", "Robert", "Patricia", "John", "Jennifer", "Michael", "Linda", "David", "Elizabeth", "William", "Barbara", "Richard", "Susan", "Joseph", "Jessica", "Thomas", "Sarah", "Christopher", "Karen", "Charles", "Nancy", "Daniel", "Lisa", "Matthew", "Betty", "Anthony", "Helen", "Mark", "Sandra"],
+    "last": ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Thompson", "White"]
+  },
+  "italian": {
+    "first": ["Giuseppe", "Maria", "Antonio", "Anna", "Francesco", "Rosa", "Angelo", "Teresa", "Vincenzo", "Lucia", "Giovanni", "Carmela", "Luigi", "Caterina"],
+    "last": ["Rossi", "Russo", "Ferrari", "Esposito", "Bianchi", "Romano", "Colombo", "Ricci", "Marino", "Greco", "Bruno", "Gallo"]
+  },
+  "french": {
+    "first": ["Jean", "Marie", "Michel", "Francoise", "Pierre", "Monique", "Andre", "Catherine", "Philippe", "Nathalie"],
+    "last": ["Martin", "Bernard", "Thomas", "Petit", "Robert", "Richard", "Durand", "Dubois", "Moreau", "Laurent"]
+  },
+  "german": {
+    "first": ["Hans", "Anna", "Klaus", "Ursula", "Jurgen", "Ingrid", "Wolfgang", "Petra", "Dieter", "Monika"],
+    "last": ["Muller", "Schmidt", "Schneider", "Fischer", "Weber", "Meyer", "Wagner", "Becker", "Schulz", "Hoffmann"]
+  },
+  "spanish": {
+    "first": ["Antonio", "Maria", "Jose", "Carmen", "Francisco", "Josefa", "Juan", "Isabel", "Manuel", "Ana"],
+    "last": ["Garcia", "Gonzalez", "Rodriguez", "Fernandez", "Lopez", "Martinez", "Sanchez", "Perez", "Gomez", "Martin"]
+  },
+  "nordic": {
+    "first": ["Erik", "Anna", "Lars", "Emma", "Nils", "Astrid", "Magnus", "Ingrid", "Bjorn", "Maja"],
+    "last": ["Andersson", "Johansson", "Karlsson", "Nilsson", "Eriksson", "Larsson", "Olsson", "Persson"]
+  },
+  "slavic": {
+    "first": ["Vladimir", "Svetlana", "Dmitri", "Natasha", "Alexei", "Irina", "Mikhail", "Elena", "Pavel", "Olga"],
+    "last": ["Ivanov", "Petrov", "Smirnov", "Kuznetsov", "Popov", "Volkov", "Novikov", "Sokolov"]
+  },
+  "eastasian": {
+    "first": ["Hiroshi", "Yuki", "Takeshi", "Akiko", "Wei", "Li", "Chen", "Wang", "Jin", "Min"],
+    "last": ["Tanaka", "Suzuki", "Takahashi", "Watanabe", "Wang", "Li", "Zhang", "Liu", "Kim", "Park"]
+  },
+  "middleeastern": {
+    "first": ["Ahmed", "Fatima", "Mohammad", "Aisha", "Ali", "Zahra", "Hassan", "Maryam", "Omar", "Layla"],
+    "last": ["Al-Ahmad", "Al-Mohammad", "Al-Ali", "Mahmoud", "Ibrahim", "Mansour", "Nasser", "Farouk"]
+  },
+  "cityMapping": {
+    "london": "english",
+    "new york": "english",
+    "los angeles": "english",
+    "chicago": "english",
+    "toronto": "english",
+    "sydney": "english",
+    "melbourne": "english",
+    "paris": "french",
+    "marseille": "french",
+    "lyon": "french",
+    "berlin": "german",
+    "munich": "german",
+    "frankfurt": "german",
+    "vienna": "german",
+    "rome": "italian",
+    "milan": "italian",
+    "naples": "italian",
+    "florence": "italian",
+    "madrid": "spanish",
+    "barcelona": "spanish",
+    "mexico city": "spanish",
+    "stockholm": "nordic",
+    "oslo": "nordic",
+    "copenhagen": "nordic",
+    "moscow": "slavic",
+    "st petersburg": "slavic",
+    "prague": "slavic",
+    "warsaw": "slavic",
+    "tokyo": "eastasian",
+    "beijing": "eastasian",
+    "shanghai": "eastasian",
+    "seoul": "eastasian",
+    "dubai": "middleeastern",
+    "cairo": "middleeastern",
+    "istanbul": "middleeastern"
+  }
+}

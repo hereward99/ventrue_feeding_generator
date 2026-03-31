@@ -1,0 +1,22 @@
+[
+  {
+    "level": "Minimal",
+    "icon": "🟢",
+    "description": "Personal assistant only"
+  },
+  {
+    "level": "Light",
+    "icon": "🟡",
+    "description": "Small security detail"
+  },
+  {
+    "level": "Moderate",
+    "icon": "🟠",
+    "description": "Professional bodyguards"
+  },
+  {
+    "level": "Heavy",
+    "icon": "🔴",
+    "description": "Multiple security layers"
+  }
+]
