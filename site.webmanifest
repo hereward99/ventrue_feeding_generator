@@ -1,7 +1,9 @@
 {
+"id": "/feeder/",
 "name":"Rosa's Ventrue Feeding Generator",
 "short_name":"Feeder",
-"start_url": "/feeder/",
+"start_url": "./",
+"scope": "/feeder/",
 "display":"standalone",
 "icons":[
 {
